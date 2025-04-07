@@ -1,11 +1,12 @@
 import { createBrowserRouter } from 'react-router-dom';
-import Home from '../pages/Home';
 import App from '../App';
+import Admin from '../pages/admin/Admin';
+import Ceo from '../pages/ceo/Ceo';
 
 const routes = [
-    // {path:"/index.html", element:<Home/>},
-    {path:"/", element:<Home/>},
-
+    {path:"/", element:null},
+    {path:"/admin", element:<Admin/>},
+    {path:"/ceo", element:<Ceo/>},
 ];
 
 const router = createBrowserRouter([{
