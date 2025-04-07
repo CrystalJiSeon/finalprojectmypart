@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.FinalProject.mappers.StoreMapper">
+	<insert id="insertStore" parameterType="StoreDto">
+		INSERT INTO store
+		(storenum, location, validcode)
+		VALUES (storenum_seq.nextval, #{location}. #{validcode})
+	</insert>
+	
+	<delete id="deleteStore" parameterType="int">
+		DELETE FROM store
+		WHERE storenum=#{storeNum}
+	</delete>
+	
+	<update id="updateStore" parameterType="StoreDto">
+		UPDATE store
+		SET location=#{location}, validcode=#{validCode}
+		WHERE storenum=#{storeNum}
+	</update>
+	
+	<select id="getStoreList" resultType="StoreDto">
+		SELECT * FROM store
+	</select>
+</mapper>
