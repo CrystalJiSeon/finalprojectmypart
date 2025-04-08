@@ -13,6 +13,7 @@ public class AdminSalesDto {
 	private String syear;
 	private String smonth;
 	private String sdate;
+	private int dailySales;
 	private int monthlySales;
 	private int yearlySales;
 	private int salesByStore;
@@ -24,4 +25,7 @@ public class AdminSalesDto {
 	private int current_students;
 	private int totalCost;
 	private List<AdminSalesDto> list;
+	private String teachername;
+	private String username;
+	
 }
