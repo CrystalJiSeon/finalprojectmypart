@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.FinalProject.mapper.AdminSalesMapper">
+	
+	<select id="getListDaily" resultType="AdminSalesDto">
+		SELECT TO_CHAR(sales_date, 'YYYY-MM') AS smonth,
+      		   SUM(sales_amount) AS monthlySales
+		FROM Sales
+		GROUP BY TO_CHAR(sales_date, 'YYYY-MM')
+		order by smonth desc
+	</select>
+	<select id="getListMonthly" resultType="AdminSalesDto">
+		SELECT TO_CHAR(sales_date, 'YYYY-MM') AS smonth,
+      		   SUM(sales_amount) AS monthlySales
+		FROM Sales
+		GROUP BY TO_CHAR(sales_date, 'YYYY-MM')
+		order by smonth desc
+	</select>
+	<select id="getListYearly" resultType="AdminSalesDto">
+		SELECT TO_CHAR(sales_date, 'YYYY') AS syear,
+	        	SUM(sales_amount) AS yearlySales
+		FROM Sales
+		GROUP BY TO_CHAR(sales_date, 'YYYY')
+		Order by syear desc
+	</select>
+	<select id="getSaleByClass" resultType="AdminSalesDto">
+		SELECT To_char(sales_date, 'YYYY-MM-DD') sdate, storenum, sales_date 
+		from SALES
+		where class_id=#{class_id}
+		order by class_id, sDate asc
+	</select>
+	<select id="getListCost" resultType="AdminSalesDto">
+		SELECT SUM(salary) AS totalCost
+		FROM Sales
+	</select>
+
+
+</mapper>
