@@ -12,26 +12,16 @@ function AdminSales(props) {
     ]);
     const [lecture, setLecture] = useState(["수업1", "수업2", "수업3"])
     const [tbody, setTbody] = useState([
-        { sales_date: "2025-01-15", sales_amount: 150000 },
-        { sales_date: "2025-01-16", sales_amount: 250000 },
-        { sales_date: "2025-01-17", sales_amount: 180000 },
-        { sales_date: "2025-01-18", sales_amount: 220000 },
-        { sales_date: "2025-01-19", sales_amount: 190000 },
-        { sales_date: "2025-01-20", sales_amount: 200000 },
-        { sales_date: "2025-01-21", sales_amount: 210000 },
-        { sales_date: "2025-01-22", sales_amount: 160000 },
-        { sales_date: "2025-01-23", sales_amount: 170000 },
-        { sales_date: "2025-01-24", sales_amount: 230000 },
-        { sales_date: "2025-01-25", sales_amount: 250000 },
-        { sales_date: "2025-01-26", sales_amount: 260000 },
-        { sales_date: "2025-01-27", sales_amount: 240000 },
-        { sales_date: "2025-01-28", sales_amount: 210000 },
-        { sales_date: "2025-01-29", sales_amount: 200000 },
-        { sales_date: "2025-01-30", sales_amount: 190000 },
-        { sales_date: "2025-01-31", sales_amount: 220000 },
-        { sales_date: "2025-02-01", sales_amount: 230000 },
-        { sales_date: "2025-02-02", sales_amount: 240000 },
-        { sales_date: "2025-02-03", sales_amount: 250000 }
+        { sales_date: "2025-01-15", sales_amount: 150000 },{ sales_date: "2025-01-16", sales_amount: 250000 },
+        { sales_date: "2025-01-17", sales_amount: 180000 },{ sales_date: "2025-01-18", sales_amount: 220000 },
+        { sales_date: "2025-01-19", sales_amount: 190000 },{ sales_date: "2025-01-20", sales_amount: 200000 },
+        { sales_date: "2025-01-21", sales_amount: 210000 },{ sales_date: "2025-01-22", sales_amount: 160000 },
+        { sales_date: "2025-01-23", sales_amount: 170000 },{ sales_date: "2025-01-24", sales_amount: 230000 },
+        { sales_date: "2025-01-25", sales_amount: 250000 },{ sales_date: "2025-01-26", sales_amount: 260000 },
+        { sales_date: "2025-01-27", sales_amount: 240000 },{ sales_date: "2025-01-28", sales_amount: 210000 },
+        { sales_date: "2025-01-29", sales_amount: 200000 },{ sales_date: "2025-01-30", sales_amount: 190000 },
+        { sales_date: "2025-01-31", sales_amount: 220000 },{ sales_date: "2025-02-01", sales_amount: 230000 },
+        { sales_date: "2025-02-02", sales_amount: 240000 },{ sales_date: "2025-02-03", sales_amount: 250000 }
     ]);
     
     useEffect(() => {
@@ -53,7 +43,7 @@ function AdminSales(props) {
         <div>
             <div className='container'>
                 <Link to={"/admin"}>Admin Main</Link>
-                <AdminSalesModal show={modalShow} title={title} btnTag={btnTag} onBtn={onBtn}/>
+                <AdminSalesModal show={modalShow} title={title} btnTag={btnTag} onBtn={onBtn} onClose={setModalShow(false)}/>
                 <div className="row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <h3 style={{ margin: 0 }}>매출 리스트</h3>
                     <div style={{ display: 'flex' }}>
