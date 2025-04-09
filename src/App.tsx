@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import './App.css'
-import { useOutlet } from 'react-router-dom'
+import { Link, useOutlet } from 'react-router-dom'
 
 function App() {
   const currentOutlet = useOutlet()
@@ -23,6 +23,9 @@ function App() {
       ) : (
         currentOutlet
       )}
+      <Link to={"/ceo"}>Ceo 기능 확인용</Link>
+      <Link to={"/admin"}>Admin 기능 확인용</Link>
+      {currentOutlet}
     </div>
   )
 }
