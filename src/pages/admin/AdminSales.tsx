@@ -2,14 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AdminSalesDto } from '../../types/AdminType';
 import AdminSalesModal from './AdminSalesModal';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-type thead = { key:string, value:string }
+type Thead = { key:string, value:string }
 //type tbody = { key:thead, value: AdminSalesDto}
 function AdminSales(props) {
-    const [thead, setThead] = useState<thead[]>([
+    const [thead, setThead] = useState<Thead[]>([
         { key: "sales_date", value: "매출일" },
         { key: "sales_amount", value: "매출" }
     ]);
+    const [teacher, setTeacher] = useState(["강사1", "강사2","강사3"])
     const [lecture, setLecture] = useState(["수업1", "수업2", "수업3"])
     const [tbody, setTbody] = useState([
         { sales_date: "2025-01-15", sales_amount: 150000 },{ sales_date: "2025-01-16", sales_amount: 250000 },
@@ -34,22 +36,28 @@ function AdminSales(props) {
     const handleAdd = () => {
         setModalShow(true)
         console.log(modalShow)
+        setTitle("매출 추가")
+        setBtnTag("추가")
     };
     const handleUpdate = () => {
         setModalShow(true)
         console.log(modalShow)
+        setTitle("매출 수정")
+        setBtnTag("수정")
     };
     return (
         <div>
             <div className='container'>
                 <Link to={"/admin"}>Admin Main</Link>
-                <AdminSalesModal show={modalShow} title={title} btnTag={btnTag} onBtn={onBtn} onClose={setModalShow(false)}/>
-                <div className="row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h3 style={{ margin: 0 }}>매출 리스트</h3>
-                    <div style={{ display: 'flex' }}>
-                        <button style={{ marginRight: '10px' }}
-                                onClick={handleAdd}>매출 추가</button>
-                        <button onClick={handleUpdate}>매출 수정</button>
+                <AdminSalesModal show={modalShow} title={title} btnTag={btnTag} onBtn={onBtn} 
+                                onClose={()=>setModalShow(false)} lecture={lecture} teacher={teacher}/>
+                <div >
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                        <h3 className="mb-0">매출 리스트</h3>
+                        <div>
+                            <button className="btn btn-primary me-2" onClick={handleAdd}>매출 추가</button>
+                            <button className="btn btn-secondary" onClick={handleUpdate}>매출 수정</button>
+                        </div>
                     </div>
                     <div>
 
