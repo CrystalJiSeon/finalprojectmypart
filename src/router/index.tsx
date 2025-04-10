@@ -3,12 +3,14 @@ import App from '../App';
 import Admin from '../pages/admin/Admin';
 import Ceo from '../pages/ceo/Ceo';
 import AdminSales from '../pages/admin/AdminSales';
+import SalesManage from '../pages/admin/SalesManage';
+import SalesStatus from '../pages/admin/SalesStatus';
 
 const routes = [
     {path:"/", element:null},
     {path:"/admin", element:<Admin/>},
-    {path:"/admin/salesmanage", element:<AdminSales/>},
-    {path:"/admin/salesstatus", element:<AdminSales/>},
+    {path:"/admin/salesmanage", element:<SalesManage/>},
+    {path:"/admin/salesstatus", element:<SalesStatus/>},
     {path:"/admin/stock", element:<Admin/>},
     {path:"/admin/class", element:<Admin/>},
     {path:"/admin/teacher", element:<Admin/>},
