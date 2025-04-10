@@ -7,7 +7,8 @@ import AdminSales from '../pages/admin/AdminSales';
 const routes = [
     {path:"/", element:null},
     {path:"/admin", element:<Admin/>},
-    {path:"/admin/sales", element:<AdminSales/>},
+    {path:"/admin/salesmanage", element:<AdminSales/>},
+    {path:"/admin/salesstatus", element:<AdminSales/>},
     {path:"/admin/stock", element:<Admin/>},
     {path:"/admin/class", element:<Admin/>},
     {path:"/admin/teacher", element:<Admin/>},
