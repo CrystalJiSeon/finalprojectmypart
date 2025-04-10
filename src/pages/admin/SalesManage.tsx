@@ -69,9 +69,9 @@ function SalesManage(props) {
                                         <Form.Select onChange={handleSelectSub} size="sm" aria-label="Default select example" className='me-2' style={{ maxWidth: "150px" }}>
                                             <option>{selected==="lectureTitle"? "과목이름":"수업분반"}</option>
                                             {selected==="lectureTitle?"?
-                                                lectureList.map(item=><option value="lectureTitle">{item}</option>)
+                                                lectureList.map((item,index)=><option key={index}>{item}</option>)
                                                 :
-                                                classList.map(item=><option value="class_id">{item}</option>)
+                                                classList.map((item,index)=><option key={index}>{item}</option>)
                                             }
                                                 
                                         </Form.Select> 
