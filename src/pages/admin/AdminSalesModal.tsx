@@ -4,10 +4,9 @@ import { Button, Dropdown, FloatingLabel, Form, ListGroup, Modal } from 'react-b
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 type Student = {id:number, name:string}
-function AdminSalesModal({show, title, btnTag, onBtn, onClose, lecture, teacher}) {
+function AdminSalesModal({show, title, btnTag, onBtn, onClose, lecture, classList}) {
     const [date, setDate] = useState('');
     const [selectedLecture, setSelectedLecture] = useState('');
-    const [selectedTeacher, setSelectedTeacher] = useState('');
     const [salesAmount, setSalesAmount] = useState(0);
     const [studentName, setStudentName] = useState<string>('');
     const [studentId, setStudentId] = useState<number>();
@@ -49,19 +48,19 @@ function AdminSalesModal({show, title, btnTag, onBtn, onClose, lecture, teacher}
                             <Form.Control  type="date"  placeholder="YYYY-MM-DD" autoFocus />
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="lecture">
-                            <Form.Label>수업</Form.Label>
+                            <Form.Label>수업분반</Form.Label>
                             <Form.Select>
                                 <option value="">수업을 선택하세요</option>
-                                {lecture.map((item, index) => (
+                                {classList.map((item, index) => (
                                     <option key={index} value={item}>{item}</option>
                                 ))}
                             </Form.Select>
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="teacher">
-                            <Form.Label>강사</Form.Label>
+                            <Form.Label>과목</Form.Label>
                             <Form.Select>
-                                <option value="">강사를 선택하세요</option>
-                                {teacher.map((item, index) => (
+                                <option value="">과목를 선택하세요</option>
+                                {lecture.map((item, index) => (
                                     <option key={index} value={item}>{item}</option>
                                 ))}
                             </Form.Select>

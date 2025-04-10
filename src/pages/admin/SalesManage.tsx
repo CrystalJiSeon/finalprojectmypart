@@ -45,7 +45,7 @@ function SalesManage(props) {
     return (
         <div>
             <AdminSalesModal show={modalShow} title={title} btnTag={btnTag} onBtn={onBtn} 
-                                onClose={()=>setModalShow(false)} lecture={lectureList} teacher={teacher}/>
+                                onClose={()=>setModalShow(false)} lecture={lectureList} classList={classList}/>
         
             <div >
             <h3 className="mb-3">매출 리스트</h3>
