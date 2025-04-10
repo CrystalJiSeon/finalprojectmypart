@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import './App.css'
 import { Link, useOutlet } from 'react-router-dom'
+import NavBar from './pages/admin/NavBar'
+
 
 function App() {
   const currentOutlet = useOutlet()
@@ -25,7 +27,13 @@ function App() {
       )}
       <Link to={"/ceo"}>Ceo 기능 확인용</Link>
       <Link to={"/admin"}>Admin 기능 확인용</Link>
-      {currentOutlet}
+      <div style={{ display: 'flex' }}>
+        
+        <NavBar/>
+        <div style={{ flex: 1, padding: '20px' }}>
+          {currentOutlet}
+        </div>
+      </div>
     </div>
   )
 }

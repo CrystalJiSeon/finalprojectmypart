@@ -19,7 +19,7 @@ function NavBar(props) {
     };
     return (
         <div>
-            <Nav variant="tabs" defaultActiveKey="/home">
+            {/* <Nav variant="tabs" defaultActiveKey="/home">
                 <Nav.Item>추후 없앨 탭들임</Nav.Item>
                 <Nav.Item>
                     <Nav.Link href="/admin/sales">Sales</Nav.Link>
@@ -36,7 +36,7 @@ function NavBar(props) {
                 <Nav.Item>
                     <Nav.Link href="/admin/student" >Student</Nav.Link>
                 </Nav.Item>
-            </Nav>
+            </Nav> */}
            
             <aside className="sidebar">
             <div className="sidebar-top">

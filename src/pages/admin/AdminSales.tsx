@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { AdminSalesDto } from '../../types/AdminType';
 import AdminSalesModal from './AdminSalesModal';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import AdminNavBar from './AdminNavBar';
+import NavBar from './NavBar';
 
 type Thead = { key:string, value:string }
 //type tbody = { key:thead, value: AdminSalesDto}
