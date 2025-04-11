@@ -5,36 +5,14 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 type Student = {id:number, name:string}
 function AdminSalesModal({show, title, btnTag, onBtn, onClose, lecture, classList}) {
-    const [date, setDate] = useState('');
+    const [sdate, setSDate] = useState('');
     const [selectedLecture, setSelectedLecture] = useState('');
+    const [selectedClass, setSelectedClass] = useState('');
     const [salesAmount, setSalesAmount] = useState(0);
     const [studentName, setStudentName] = useState<string>('');
-    const [studentId, setStudentId] = useState<number>();
-    const [studentList, setStudentList] = useState<Student[]>([]);
-    const [showDropdown, setShowDropdown] = useState(false);
 
-    useEffect(() => {
-        if (studentName.length > 1) {
-            axios.get(`/api/students/search?name=${studentName}`)
-                .then(res => {
-                    setStudentList(res.data);
-                    setShowDropdown(true);
-                })
-                .catch(err => {
-                    console.error(err);
-                    setStudentList([]);
-                    setShowDropdown(false);
-                });
-        } else {
-            setShowDropdown(false);
-        }
-    }, [studentName]);
+ 
 
-    const handleSelectStudent = (student:Student) => {
-        setStudentName(student.name);
-        setStudentId(student.id);
-        setShowDropdown(false);
-    };
     return (
         <>
             <Modal show={show} size="lg" centered>
@@ -48,9 +26,9 @@ function AdminSalesModal({show, title, btnTag, onBtn, onClose, lecture, classLis
                             <Form.Control  type="date"  placeholder="YYYY-MM-DD" autoFocus />
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="lecture">
-                            <Form.Label>수업분반</Form.Label>
-                            <Form.Select>
-                                <option value="">수업을 선택하세요</option>
+                            <Form.Label>수업 분반</Form.Label>
+                            <Form.Select onChange={((e)=>setSelectedClass(e.target.value))}>
+                                <option value="">강사를 선택하세요</option>
                                 {classList.map((item, index) => (
                                     <option key={index} value={item}>{item}</option>
                                 ))}
@@ -58,7 +36,7 @@ function AdminSalesModal({show, title, btnTag, onBtn, onClose, lecture, classLis
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="teacher">
                             <Form.Label>과목</Form.Label>
-                            <Form.Select>
+                            <Form.Select onChange={((e)=>setSelectedLecture(e.target.value))}>
                                 <option value="">과목를 선택하세요</option>
                                 {lecture.map((item, index) => (
                                     <option key={index} value={item}>{item}</option>
@@ -66,36 +44,22 @@ function AdminSalesModal({show, title, btnTag, onBtn, onClose, lecture, classLis
                             </Form.Select>
                         </Form.Group>
                         <Form.Group className="mb-3 position-relative" controlId="student">
-                        <Form.Label>학생 이름 검색</Form.Label>
+                        <Form.Label>{btnTag==="추가"? "등록한 학생 이름":"학생 이름 수정하기"}</Form.Label>
                         <Form.Control
                             type="text"
                             placeholder="학생 이름을 입력하세요"
                             value={studentName}
                             onChange={e => setStudentName(e.target.value)}
-                            autoComplete="off"
-                        />
-                        {showDropdown && (
-                            <ListGroup style={{ position: 'absolute', zIndex: 1000, width: '100%' }}>
-                                {studentList.map((student) => (
-                                    <ListGroup.Item
-                                        key={student.id}
-                                        action
-                                        onClick={() => handleSelectStudent(student)}
-                                    >
-                                        {student.name} (ID: {student.id})
-                                    </ListGroup.Item>
-                                ))}
-                            </ListGroup>
-                        )}
+                            autoComplete="off"/>
                     </Form.Group>
                         <Form.Group className="mb-3" controlId="sales_amount">
                             <Form.Label>매출 입력</Form.Label>
-                            <Form.Control  type="number"  placeholder="숫자 입력" autoFocus />
+                            <Form.Control  type="number"  placeholder="숫자 입력" onChange={e => setSalesAmount(Number(e.target.value))} />
                         </Form.Group>
                     </Form>        
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button onClick={onBtn}>{btnTag}</Button>
+                    <Button onClick={()=>{onBtn({sdate,selectedLecture,selectedClass,salesAmount,studentName})}}>{btnTag}</Button>
                 </Modal.Footer>
             </Modal>
         </>

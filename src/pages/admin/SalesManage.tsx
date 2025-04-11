@@ -1,6 +1,7 @@
 import React, { MouseEvent, useEffect, useState } from 'react';
 import AdminSalesModal from './AdminSalesModal';
 import { Button, Form } from 'react-bootstrap';
+import axios from 'axios';
 
 function SalesManage(props) {
     const [teacher, setTeacher] = useState(["강사1", "강사2","강사3"])
@@ -26,11 +27,30 @@ function SalesManage(props) {
         setSelectedSub(e.target.value)
         console.log(selectedSub)
     };
+    const handleAddSales = async(data:{
+        sdate:string;
+        selectedLecture: string;
+        selectedClass: string;
+        selectedSalesAmount:number;
+        studentId?:number;
+        studentName:string;
+    })=>{
+        try{
+            const res = await axios.post("/api/sales",data)
+            console.log(data)
+            alert("매출이 추가되었습니다")
+            
+            setModalShow(false)
+        }catch(error){
+            console.error("매출 추가 실패:", error)
+            alert("매출을 추가할 수 없습니다.")
+        }
+    }
     const handleAdd = () => {
-        setModalShow(true)
-        console.log(modalShow)
         setTitle("매출 추가")
         setBtnTag("추가")
+        setOnBtn(()=>handleAddSales)
+        setModalShow(true)
     };
     const handleUpdate = () => {
         setModalShow(true)
