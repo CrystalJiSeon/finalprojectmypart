@@ -6,7 +6,7 @@ import lombok.Data;
 public class SalesDto {
 	int adminsaleid;//지점 adminsale 고유번호
 	int ceosaleid;//본사 ceosale 고유번호
-	int storenum;//매장번호 = tb_user.storename
+	String storename;//매장번호 = tb_user.storename
 	String salename;//매출 항목
 	String credate;//매출 날짜
 	String editdate;//매출 수정 날짜
@@ -16,10 +16,12 @@ public class SalesDto {
 	String auto;//default: yes(발주나 수업에서 처리됨), no: 담당자가 직접 입력
 
 	//쿼리문 관련
+	int totalprofit;//총수입
+	int totalcost;//총지출
 	int totalprice;//총금액
 	String sdate;//문자열로 변환된 date 타입의 data
-	String smonth;//상기 동일  
-	String syear;//상기 동일
+	String smonth;//상동  
+	String syear;//상동
 	//수업 관련 : tb_class, tb_student_class
 	String clsstatus;//수업 상태 : 진행중
 	int classid;//수업 고유 번호

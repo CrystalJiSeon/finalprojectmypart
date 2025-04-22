@@ -3,13 +3,13 @@ package com.example.FinalProject.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.FinalProject.service.SalesService;
+import com.example.FinalProject.service.AdminSalesService;
 
 
 
 @RestController
 public class AdminSalesController {
-	@Autowired SalesService service;
+	@Autowired AdminSalesService service;
 	
 	
 }

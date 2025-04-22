@@ -9,7 +9,7 @@ import com.example.FinalProject.dto.AdminSalesDto;
 import com.example.FinalProject.mapper.AdminSalesMapper;
 
 @Service
-public class SalesServiceImpl implements SalesService{
+public class AdminSalesServiceImpl implements AdminSalesService{
 
 	@Autowired AdminSalesMapper mapper;
 	@Override

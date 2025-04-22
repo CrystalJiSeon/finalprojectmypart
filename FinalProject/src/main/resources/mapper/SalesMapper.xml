@@ -6,7 +6,7 @@
 	  SELECT *
 	  FROM tb_adminsale
 	  <where>
-	    storenum = #{storenum}
+	    storename = #{storename}
 	    <if test="bcodes != null and bcodes.size() > 0">
 	      AND bcode IN
 	      <foreach item="bcode" collection="bcodes" open="(" separator="," close=")">
@@ -16,7 +16,46 @@
 	  </where>
 	  ORDER BY credate DESC
 	</select>
-
-
-
+	<select id="getAdminSalebyId">
+		select * from tb_adminsale
+		where adminsaleid=#{adminsaleid}
+	</select>
+	<insert id="insertAdminSales">
+		insert into tb_adminsale
+		(adminsaleid, storename, credate, editdate, salename, price, acode, bcode, auto)
+		values 
+		(adminsale_seq.nextval, #{storename}, sysdate, sysdate, #{salename}, #{price}, #{acode}, #{bcode}, 'NO' )				
+	</insert>
+	<update id="editAdminSales">
+		update tb_adminsale
+		set (storename=#{storename}, editdate=sysdate, salename=#{salename}, 
+		     price=#{price}, acode=#{acode}, bcode=#{bcode}, auto='NO')
+		where adminsaleid=#{adminsaleid}
+	</update>
+	<delete id="deleteAdminSales">
+		delete from tb_adminsale
+		where adminsaleid=#{adminsaleid}
+	</delete>
+	<insert id="insertOrderApprovedCost">
+		insert into tb_adminsale
+		(adminsaleid, storename,credate,editdate, salename,price, acode, bcode,auto)
+		values 
+		(adminsale_seq.nextval,#{storename}, sysdate, sysdate, #{salename}, #{price}, #{acode}, #{bcode}, 'YES') 
+	</insert>
+	<select id="countByClassId" resultType="int">
+	  SELECT COUNT(*) 
+	  FROM tb_student_class 
+	  WHERE classid = #{classid}
+	</select>
+	<select id="getPriceByClassId" resultType="int">
+	  SELECT price 
+	  FROM tb_class 
+	  WHERE classid = #{classid}
+	</select>
+	<select id="getNameByClassId" resultType="string">
+	  SELECT classname 
+	  FROM tb_class 
+	  WHERE classid = #{classid}
+	</select>
+	
 </mapper>
