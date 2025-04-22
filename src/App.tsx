@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import './App.css'
 import { Link, useOutlet } from 'react-router-dom'
 import NavBar from './pages/admin/NavBar'
 

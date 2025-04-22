@@ -5,8 +5,8 @@ import axios from 'axios';
 
 function SalesManage(props) {
     const [teacher, setTeacher] = useState(["강사1", "강사2","강사3"])
-    const [lectureList, setLectureList] = useState(["과목1", "과목2", "과목3"])
-    const [classList, setClassList] = useState(["수업1", "수업2", "수업3"])
+    const [bcode, setBcodeList] = useState(["수업료 수입", "기타 수입", "강사 월급", "발주 비용", "기타 지출"])
+    const [acode, setAcodeList] = useState(["수입", "지출"])
     const [modalShow, setModalShow] = useState(false);
     const [title, setTitle] = useState("매출 추가");
     const [btnTag, setBtnTag] = useState("추가")
@@ -65,39 +65,19 @@ function SalesManage(props) {
     return (
         <div>
             <AdminSalesModal show={modalShow} title={title} btnTag={btnTag} onBtn={onBtn} 
-                                onClose={()=>setModalShow(false)} lecture={lectureList} classList={classList}/>
+                                onClose={()=>setModalShow(false)} acode={acode} bcode={bcode}/>
         
             <div >
             <h3 className="mb-3">매출 리스트</h3>
                 <div className="d-flex justify-content-between align-items-center mb-3 row">
                     <div className="col-md-8 col-12 d-flex justify-content-between align-items-center">
                         <Form className='d-flex w-100'>
-                            <Form.Group>
-                                <Form.Control size="sm" type="date" placeholder="날짜" />
-                            </Form.Group>
-                            <Form.Select onChange={handleSelect} size="sm" aria-label="Default select example" className='me-2' style={{ maxWidth: "150px" }}>
-                                <option value="condition">검색 조건</option>
-                                <option value="lectureTitle">과목이름</option>
-                                <option value="class_id">수업분반</option>
-                                <option value="studentName">학생이름</option>
-                            </Form.Select>
-                            <Form.Group hidden={hideSubCondition} controlId="search" className="mb-0 me-2" style={{ maxWidth: "300px" }}>
-                                {
-                                    selected==="studentName"?
-                                        <Form.Control size="sm" type="text" placeholder="학생 이름을 입력하세요" />
-                                    :
-                                        <Form.Select onChange={handleSelectSub} size="sm" aria-label="Default select example" className='me-2' style={{ maxWidth: "150px" }}>
-                                            <option>{selected==="lectureTitle"? "과목이름":"수업분반"}</option>
-                                            {selected==="lectureTitle?"?
-                                                lectureList.map((item,index)=><option key={index}>{item}</option>)
-                                                :
-                                                classList.map((item,index)=><option key={index}>{item}</option>)
-                                            }
-                                                
-                                        </Form.Select> 
-                                }
-                            </Form.Group>
-                            <Button className='btn btn-secondary' size="sm" style={{ width: "120px" }}>검색</Button>
+                            <Form.Check inline label="수업료 수입" name="group1" type="checkbox" id={`inline-checkbox-1`}/>
+                            <Form.Check inline label="기타 수입" name="group1" type="checkbox" id={`inline-checkbox-2`}/>
+                            <Form.Check inline label="강사 월급" name="group1" type="checkbox" id={`inline-checkbox-3`}/>
+                            <Form.Check inline label="발주 비용" name="group1" type="checkbox" id={`inline-checkbox-3`}/>
+                            <Form.Check inline label="기타 지출" name="group1" type="checkbox" id={`inline-checkbox-3`}/>
+                            <Button className='btn btn-secondary' size="sm" style={{ width: "50px" }}>검색</Button>
                         </Form>
                     </div>
                     <div className='col-md-4 col-12 d-flex justify-content-end mt-3 mt-md-0'>
