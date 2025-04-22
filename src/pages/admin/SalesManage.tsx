@@ -108,26 +108,24 @@ function SalesManage(props) {
                     <table className="table table-bordered responsive">
                         <thead className="table-light">
                             <tr>
-                                <th>순번</th>
-                                <th>매출식별자</th>
-                                <th>수업분반</th>
-                                <th>과목</th>
-                                <th>학생이름</th>
-                                <th>매출일자</th>
-                                <th>매출</th>
+                                <th>매출등록일자</th>
+                                <th>매출수정일자</th>
+                                <th>항목 내용</th>
+                                <th>금액</th>
+                                <th>구분</th>
+                                <th>구분상세</th>
                                 <th>수정</th>
                                 <th>삭제</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr className="table-hover">
-                                <td>1</td>
-                                <td>12345</td>
-                                <td>분반 A</td>
-                                <td>과목 1</td>
-                                <td>홍길동</td>
                                 <td>2025-04-10</td>
-                                <td>100,000원</td>
+                                <td>2025-04-10</td>
+                                <td>강사 홍길동 월급</td>
+                                <td>3000000</td>
+                                <td>지출</td>
+                                <td>강사월급</td>
                                 <td>
                                     <button onClick={handleUpdate} className="btn btn-sm btn-outline-primary">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">
