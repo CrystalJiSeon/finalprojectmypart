@@ -15,10 +15,22 @@ public interface AdminSalesMapper {
 	//연 매출 가져오기(연도별 매출이 그래프 한 기둥 = 한 칼럼 )
 	List<AdminSalesDto> getListYearly();
 	
-	//수업별 월매출 가져오기
+	//강사별 월매출 가져오기
 	List<AdminSalesDto> getMonthlyByClass();
-	//수업별 연매출 가져오기
+	//강사별 연매출 가져오기
 	List<AdminSalesDto> getYearlyByClass();
+	
+	//수업별 월매출 가져오기
+	List<AdminSalesDto> getMonthlyByLecture();
+	//수업별 연매출 가져오기
+	List<AdminSalesDto> getYearlyByLecture();
+	
+	//연도별 상반기/하반기 가져오기(1월 ~6월, 7월 ~12월) 
+	List<AdminSalesDto> getListHalfByYear();
+	//강사별 상반기/하반기 가져오기(1월 ~6월, 7월 ~12월) 
+	List<AdminSalesDto> getListHalfByClass();	
+	//수업별 상반기/하반기 가져오기(1월 ~6월, 7월 ~12월) 
+	List<AdminSalesDto> getListHalfByLecture();
 	
 	//지출 연도별 -강사 월급 지출 가져오기
 	List<AdminSalesDto>	getListCost();
@@ -36,6 +48,8 @@ public interface AdminSalesMapper {
 	int getLectureId(int class_id);
 	//매장 번호 가져오기
 	int getStorenum(String username);
+	//학생 번호 가져오기
+	int getStudentId(int class_id);
 	
 	
 }

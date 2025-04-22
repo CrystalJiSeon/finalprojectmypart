@@ -25,6 +25,7 @@
 		Order by syear asc
 	</select>
 	
+	
 	<select id="getYearlyByClass" resultType="AdminSalesDto">
 		SELECT TO_CHAR(sales_date, 'YYYY') AS syear,
 	        	SUM(sales_amount) AS yearlySales
@@ -40,12 +41,59 @@
 		order by lecture_id asc
 	</select>
 	
+	
+	<select id="getYearlyByLecutre" resultType="AdminSalesDto">
+		SELECT TO_CHAR(sales_date, 'YYYY') AS syear,
+	        	SUM(sales_amount) AS yearlySales
+		from SALES
+		group by lecture_id
+		order by class_id asc
+	</select>
+	<select id="getMonthlyByLecture" resultType="AdminSalesDto">
+		SELECT TO_CHAR(sales_date, 'YYYY-MM') AS smonth,
+      		   SUM(sales_amount) AS monthlySales
+		from SALES
+		group by lecture_id
+		order by class_id asc
+	</select>
+	
+	
+	<select id="getListHalfByYear" resultType="AdminSalesDto">
+		SELECT
+			case when extract(month from sales_date) between 1 and 6 then 'firsthalf' else 'secondhalf' end as period,
+			sum(sales_amount) as total
+		FROM Sales
+		group by extract(year from sales_date), 
+			case when extract(month from sales_date) between 1 and 6 then 'firsthalf' else 'secondhalf' end
+		order by year, period
+	</select>
+	<select id="getListHalfByClass" resultType="AdminSalesDto">
+		SELECT
+			case when extract(month from sales_date) between 1 and 6 then 'firsthalf' else 'secondhalf' end as period,
+			sum(sales_amount) as total
+		FROM Sales
+		group by class_id, 
+			case when extract(month from sales_date) between 1 and 6 then 'firsthalf' else 'secondhalf' end
+		order by year, period
+	</select>
+	<select id="getListHalfByLecture" resultType="AdminSalesDto">
+		SELECT
+			case when extract(month from sales_date) between 1 and 6 then 'firsthalf' else 'secondhalf' end as period,
+			sum(sales_amount) as total
+		FROM Sales
+		group by lecture_id, 
+			case when extract(month from sales_date) between 1 and 6 then 'firsthalf' else 'secondhalf' end
+		order by year, period
+	</select>
+	
+	
 	<select id="getListCost" resultType="AdminSalesDto">
 		SELECT t.name teachername, t.teacher_id, t.salary*Floor((c.end_date-c.start_date)/30) as sal
 		FROM Teacher t
 		join class c on t.teacher_id = c.teacher_id
 		order by t.name asc
 	</select>
+	
 	
 	<insert id="insert" parameterType = "AdminSalesDto">
 		insert into sales(sales_id, storenum, class_id,lecture_id,student_id,sales_date,sales_amount) 
@@ -54,7 +102,7 @@
 	<update id="update" parameterType="AdminSalesDto">
 		update sales
 		set class_id=#{class_id}, lecture_id=#{lecture_id}, student_id=#{student_id}
-		 	sales_date=#{sales_date}, sales_amount=#{sales_amount}
+		 	sales_date=#{sales_date}, updatedat=sysdate, sales_amount=#{sales_amount}
 		where sales_id=#{sales_id}
 	</update>
 	<delete id="delete" parameterType="int">

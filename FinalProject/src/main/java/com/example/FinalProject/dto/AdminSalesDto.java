@@ -7,7 +7,9 @@ public class AdminSalesDto {
 	private int storenum;
 	private int class_id;
 	private int lecture_id;
+	private int student_id;
 	private String sales_date;
+	private String updatedat;
 	private int sales_amount;
 	private String sday;
 	private String syear;
@@ -27,5 +29,8 @@ public class AdminSalesDto {
 	private List<AdminSalesDto> list;
 	private String teachername;
 	private String username;
+	private int firsthalf;
+	private int secondhalf;
+	private String period;
 	
 }

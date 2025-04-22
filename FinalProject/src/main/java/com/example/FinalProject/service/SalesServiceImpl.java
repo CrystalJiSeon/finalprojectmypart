@@ -2,13 +2,16 @@ package com.example.FinalProject.service;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.FinalProject.dto.AdminSalesDto;
+import com.example.FinalProject.mapper.AdminSalesMapper;
 
 @Service
 public class SalesServiceImpl implements SalesService{
 
+	@Autowired AdminSalesMapper mapper;
 	@Override
 	public int addSales(AdminSalesDto dto) {
 		
@@ -26,6 +29,7 @@ public class SalesServiceImpl implements SalesService{
 		
 		return 0;
 	}
+
 	@Override
 	public List<AdminSalesDto> getListDaily(String sales_date) {
 		
@@ -40,18 +44,48 @@ public class SalesServiceImpl implements SalesService{
 
 	@Override
 	public List<AdminSalesDto> getListYearly(String sales_date) {
-		
+
 		return null;
 	}
 
 	@Override
 	public List<AdminSalesDto> getMonthlyByClass(int class_id) {
-		
+
 		return null;
 	}
 
 	@Override
 	public List<AdminSalesDto> getYealryByClass(int class_id) {
+
+		return null;
+	}
+
+	@Override
+	public List<AdminSalesDto> getMonthlyByLecture(int lecture_id) {
+
+		return null;
+	}
+
+	@Override
+	public List<AdminSalesDto> getYealryByLecture(int lecture_id) {
+
+		return null;
+	}
+
+	@Override
+	public List<AdminSalesDto> getListHalf() {
+
+		return null;
+	}
+
+	@Override
+	public List<AdminSalesDto> getListHalfByClass() {
+
+		return null;
+	}
+
+	@Override
+	public List<AdminSalesDto> getListHalfByLecture() {
 		
 		return null;
 	}
@@ -61,7 +95,5 @@ public class SalesServiceImpl implements SalesService{
 		
 		return null;
 	}
-
-
 	
 }

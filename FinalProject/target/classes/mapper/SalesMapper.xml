@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.SalesMapper">
+
+	<select id="getAdminSalesList" parameterType="map" resultType="AdminSale">
+	  SELECT *
+	  FROM tb_adminsale
+	  <where>
+	    storenum = #{storenum}
+	    <if test="bcodes != null and bcodes.size() > 0">
+	      AND bcode IN
+	      <foreach item="bcode" collection="bcodes" open="(" separator="," close=")">
+	        #{bcode}
+	      </foreach>
+	    </if>
+	  </where>
+	  ORDER BY credate DESC
+	</select>
+
+
+
+</mapper>
