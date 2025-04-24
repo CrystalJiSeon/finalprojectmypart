@@ -2,60 +2,80 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="mapper.SalesMapper">
 
-	<select id="getAdminSalesList" parameterType="map" resultType="AdminSale">
+	<select id="getAdminSalesList" parameterType="map" resultType="SalesDto">
 	  SELECT *
 	  FROM tb_adminsale
 	  <where>
-	    storename = #{storename}
+	    store_name = #{store_name}
 	    <if test="bcodes != null and bcodes.size() > 0">
-	      AND bcode IN
+	      AND b_code IN
 	      <foreach item="bcode" collection="bcodes" open="(" separator="," close=")">
-	        #{bcode}
+	        #{b_code}
 	      </foreach>
 	    </if>
 	  </where>
 	  ORDER BY credate DESC
 	</select>
-	<select id="getAdminSalebyId">
+	<select id="getAdminSalebyId" parameterType="int" resultType="SalesDto">
 		select * from tb_adminsale
-		where adminsaleid=#{adminsaleid}
+		where adminsale_id=#{adminsale_id}
 	</select>
-	<insert id="insertAdminSales">
+	<insert id="insertAdminSales" parameterType="SalesDto" resultType="">
 		insert into tb_adminsale
-		(adminsaleid, storename, credate, editdate, salename, price, acode, bcode, auto)
+		(adminsale_id, store_name, cre_date, edit_date, sale_name, price, a_code, b_code, auto)
 		values 
-		(adminsale_seq.nextval, #{storename}, sysdate, sysdate, #{salename}, #{price}, #{acode}, #{bcode}, 'NO' )				
+		(adminsale_seq.nextval, #{store_name}, sysdate, sysdate, #{sale_name}, #{price}, #{a_code}, #{b_code}, 'NO' )				
 	</insert>
 	<update id="editAdminSales">
 		update tb_adminsale
-		set (storename=#{storename}, editdate=sysdate, salename=#{salename}, 
-		     price=#{price}, acode=#{acode}, bcode=#{bcode}, auto='NO')
-		where adminsaleid=#{adminsaleid}
+		set (store_name=#{store_name}, edit_date=sysdate, sale_name=#{sale_name}, 
+		     price=#{price}, a_code=#{a_code}, b_code=#{b_code}, auto='NO')
+		where adminsale_id=#{adminsale_id}
 	</update>
 	<delete id="deleteAdminSales">
 		delete from tb_adminsale
-		where adminsaleid=#{adminsaleid}
+		where adminsale_id=#{adminsale_id}
 	</delete>
 	<insert id="insertOrderApprovedCost">
 		insert into tb_adminsale
-		(adminsaleid, storename,credate,editdate, salename,price, acode, bcode,auto)
+		(adminsale_id, store_name,cre_date,edit_date, sale_name,price, a_code, b_code,auto)
 		values 
-		(adminsale_seq.nextval,#{storename}, sysdate, sysdate, #{salename}, #{price}, #{acode}, #{bcode}, 'YES') 
+		(adminsale_seq.nextval,#{store_name}, sysdate, sysdate, #{sale_name}, #{price}, #{a_code}, #{b_code}, 'YES') 
 	</insert>
-	<select id="countByClassId" resultType="int">
-	  SELECT COUNT(*) 
-	  FROM tb_student_class 
-	  WHERE classid = #{classid}
+	<select id="getApprovedOrderId" parameterType="String" resultType="int">
+	  SELECT order_id, total_price, status 
+	  FROM tb_order 
+	  WHERE status = #{status}
 	</select>
-	<select id="getPriceByClassId" resultType="int">
-	  SELECT price 
+	<select id="getOrderDetailByOrderId" resultType="int">
+	  SELECT order_detail_id, product_id, quantity, price, quantity*price as calprice
+	  FROM tb_order_detail 
+	  WHERE order_detail_id = #{order_detail_id}
+	</select>
+	<select id="getNameByProductId" resultType="string">
+	  SELECT product_id, product_name
 	  FROM tb_class 
-	  WHERE classid = #{classid}
+	  WHERE product_id = #{product_id}
 	</select>
+	<insert id="insertClsIngProfit">
+		insert into tb_adminsale
+		(adminsale_id, store_name,cre_date,edit_date, sale_name,price, a_code, b_code,auto)
+		values 
+		(adminsale_seq.nextval,#{store_name}, sysdate, sysdate, #{sale_name}, #{price}, #{a_code}, #{b_code}, 'YES') 
+	</insert>
+	<select id="getProfitByClassId" resultType="int">
+	  SELECT sc.class_id, COUNT(*) as student_count, c.price, COUNT(*)*c.price as profit  
+	  FROM tb_student_class sc
+	  Inner Join tb_class c on sc.class_id=c.class_id
+	  WHERE sc.class_id= #{class_id}
+	  group by sc.class_id
+	</select>>
 	<select id="getNameByClassId" resultType="string">
-	  SELECT classname 
+	  SELECT class_name 
 	  FROM tb_class 
-	  WHERE classid = #{classid}
+	  WHERE class_id = #{class_id}
 	</select>
+	
+
 	
 </mapper>
