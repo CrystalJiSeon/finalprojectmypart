@@ -1,28 +1,27 @@
-import { useState } from 'react'
-import { Link, useOutlet } from 'react-router-dom'
-import NavBar from './pages/admin/NavBar'
-import '../public/LayoutCss.css'
-import '../public/HeaderCss.css'
-import Toast from '../components/common/Toast'; // 토스트 컴포넌트
+import React, { useEffect, useState } from 'react';
+import { Routes, Route, Navigate, BrowserRouter } from 'react-router-dom';
+import Login from './pages/Login';
+import Main from './pages/Main'; // 메인 대시보드 컴포넌트
+import Layout from './pages/Layout'; // NavBar + Header 포함된 레이아웃
+import SalesManage from './pages/admin/SalesManage';
+import SalesStatus from './pages/admin/SalesStatus';
 
 function App() {
-  const currentOutlet = useOutlet()
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  useEffect(()=>{
+    setIsLoggedIn(true)
+  },[])
   return (
-    <div>
-      
-      <Link to={"/ceo"}>Ceo 기능 확인용</Link>
-      <Link to={"/admin"}>Admin 기능 확인용</Link>
-      <NavBar/>
-      <div className='contianer'>
+    <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Main/>}/>
+            <Route path="/salesManage" element={<SalesManage/>}/>
+            <Route path="/salesStatus" element={<SalesStatus/>}/>
+          </Routes>
+    </BrowserRouter>
     
-        <div className='main-container' >
-          {currentOutlet}
-        </div>
-      </div>
-    </div>
-  )
+
+  );
 }
 
-export default App
+export default App;

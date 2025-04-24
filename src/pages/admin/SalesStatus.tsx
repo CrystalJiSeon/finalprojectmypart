@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import Layout from '../Layout';
 type Thead = { key:string, value:string }
 function SalesStatus(props) {
     const [thead, setThead] = useState<Thead[]>([
@@ -21,7 +24,7 @@ function SalesStatus(props) {
     ]);
     
     return (
-        <div>
+        <Layout currentMenu="salesstat">
             <div>
                 <h3>매출 확인 영역</h3>
                 <table>
@@ -42,8 +45,7 @@ function SalesStatus(props) {
                     </tbody>
                 </table>
             </div>
-        </div>
+        </Layout>
     );
 }
-
 export default SalesStatus;

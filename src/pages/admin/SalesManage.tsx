@@ -2,8 +2,11 @@ import React, { MouseEvent, useEffect, useState } from 'react';
 import AdminSalesModal from './AdminSalesModal';
 import { Button, Form } from 'react-bootstrap';
 import axios from 'axios';
+import { BrowserRouter } from 'react-router-dom';
+import ReactDOM from 'react-dom/client';
+import Layout from '../Layout';
 
-function SalesManage(props) {
+function SalesManage() {
     const [teacher, setTeacher] = useState(["강사1", "강사2","강사3"])
     const [bcode, setBcodeList] = useState(["수업료 수입", "기타 수입", "강사 월급", "발주 비용", "기타 지출"])
     const [acode, setAcodeList] = useState(["수입", "지출"])
@@ -63,11 +66,11 @@ function SalesManage(props) {
     }, [selected, selectedSub]);  // selected 값이 변경될 때마다 이 코드가 실행됩니다.
 
     return (
-        <div>
+        <Layout currentMenu="salesmanage">
             <AdminSalesModal show={modalShow} title={title} btnTag={btnTag} onBtn={onBtn} 
                                 onClose={()=>setModalShow(false)} acode={acode} bcode={bcode}/>
         
-            <div >
+            <div className='container'>
             <h3 className="mb-3">매출 리스트</h3>
                 <div className="d-flex justify-content-between align-items-center mb-3 row">
                     <div className="col-md-8 col-12 d-flex justify-content-between align-items-center">
@@ -127,8 +130,9 @@ function SalesManage(props) {
                     </table>
                 </div>
             </div>
-        </div>
+        </Layout>
     );
 }
 
-export default SalesManage; 
+export default SalesManage
+

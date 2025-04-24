@@ -1,25 +1,31 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Nav } from 'react-bootstrap';
 import { useLocation } from 'react-router-dom';
-import '../../../public/AdminNavCss.css'
-function NavBar(props) {
+
+function NavBar({currentMenu}) {
     const [activeSubMenu, setActiveSubMenu] = useState(() => {
         const path = window.location.pathname;
         return path.split('/').pop();
     });
-    const [currentMenu, setCurrentMenu]=useState();
     const location = useLocation();
-    const handleSubMenuClick = (subMenu, path) => {
-        setActiveSubMenu(subMenu);
-        window.location.href = path;
-    };
-    
+    useEffect(()=>{
+        if(location.pathname==='/main'){
+            setActiveSubMenu(null);
+        }
+    },[location.pathname])
     const handleMenuClick = (menu) => {
         setActiveSubMenu(null);
     };
+    const handleSubMenuClick = (subMenu, path) => {
+        setActiveSubMenu(subMenu);
+        window.location.href = path;
+        console.log(path)
+    };
+    
+ 
     return (
-        <div>         
-            <aside className="sidebar">
+            
+        <aside className="sidebar">
             <div className="sidebar-top">
                 <div className="user-info">
                     <div className="user-name">
@@ -29,17 +35,17 @@ function NavBar(props) {
                     <button className="box small">로그아웃 버튼</button>
                 </div>
             </div>
-            <ul>
+            <ul className={`menu ${currentMenu}`}>
                 <li>
-                    <span>
+                    <span className={currentMenu.startsWith('sales')?'active':''}>
                         <i className="bi bi-piggy-bank"></i>매출 관리
                     </span>
                     <ul className="submenu">
-                        <li >
-                            <a href="#" onClick={() => handleSubMenuClick('submenu1', '/admin/salesmanage')}>매출관리</a>
+                        <li className={currentMenu ==='salesmanage'?'active':''}>
+                            <a href="#" onClick={() => handleSubMenuClick('salesManage', '/salesManage')}>매출관리</a>
                         </li>
-                        <li >
-                            <a href="#" onClick={() => handleSubMenuClick('submenu2', '/admin/salesstatus')}>매출현황</a>
+                        <li className={currentMenu==='salesstat'?'active':''}>
+                            <a href="#" onClick={() => handleSubMenuClick('salesStat', '/salesStatus')}>매출현황</a>
                         </li>
                     </ul>
                 </li>
@@ -102,7 +108,7 @@ function NavBar(props) {
                 </li>
             </ul>
         </aside>
-        </div>
+        
     );
 }
 

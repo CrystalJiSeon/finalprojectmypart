@@ -1,10 +1,11 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { RouterProvider } from 'react-router-dom'
+import { BrowserRouter, RouterProvider } from 'react-router-dom'
 import router from './router'
-
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <RouterProvider router={router} />
-  </StrictMode>,
+import App from './App'
+import Login from './pages/Login'
+import ReactDOM from 'react-dom/client';
+const root = ReactDOM.createRoot(document.getElementById('root')!)
+root.render(
+  <App/>
 )
