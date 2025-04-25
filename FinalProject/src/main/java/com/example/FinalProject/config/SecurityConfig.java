@@ -34,7 +34,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
-        String[] whiteList= {"/", "/home", "/h2-console/**", "/order/**"};
+        String[] whiteList= {"/", "/home", "/h2-console/**", "/order/**", "/sales/**"};
 
         httpSecurity
                 .headers(header->

@@ -7,20 +7,33 @@
 	  FROM tb_adminsale
 	  <where>
 	    store_name = #{store_name}
-	    <if test="bcodes != null and bcodes.size() > 0">
-	      AND b_code IN
-	      <foreach item="bcode" collection="bcodes" open="(" separator="," close=")">
-	        #{b_code}
+	    <if test="b_codes != null and bcodes.size() > 0">
+	      AND b_codes IN
+	      <foreach item="b_code" collection="b_codes" open="(" separator="," close=")">
+	        #{b_codes}
 	      </foreach>
 	    </if>
 	  </where>
 	  ORDER BY credate DESC
 	</select>
-	<select id="getAdminSalebyId" parameterType="int" resultType="SalesDto">
+	<select id="getCount" parameterType="AdminSalesDto" resultType="int">
+		select nvl(max(rownum),0)
+		from tb_adminsale 
+		<where>
+	    store_name = #{store_name}
+	    <if test="b_codes != null and bcodes.size() > 0">
+	      AND b_codes IN
+	      <foreach item="b_code" collection="b_codes" open="(" separator="," close=")">
+	        #{b_codes}
+	      </foreach>
+	    </if>
+	  </where>
+	</select>
+	<select id="getAdminSaleById" parameterType="int" resultType="SalesDto">
 		select * from tb_adminsale
 		where adminsale_id=#{adminsale_id}
 	</select>
-	<insert id="insertAdminSales" parameterType="SalesDto" resultType="">
+	<insert id="insertAdminSales" parameterType="SalesDto">
 		insert into tb_adminsale
 		(adminsale_id, store_name, cre_date, edit_date, sale_name, price, a_code, b_code, auto)
 		values 
@@ -43,14 +56,14 @@
 		(adminsale_seq.nextval,#{store_name}, sysdate, sysdate, #{sale_name}, #{price}, #{a_code}, #{b_code}, 'YES') 
 	</insert>
 	<select id="getApprovedOrderId" parameterType="String" resultType="int">
-	  SELECT order_id, total_price, status 
+	  SELECT order_id
 	  FROM tb_order 
 	  WHERE status = #{status}
 	</select>
 	<select id="getOrderDetailByOrderId" resultType="int">
 	  SELECT order_detail_id, product_id, quantity, price, quantity*price as calprice
 	  FROM tb_order_detail 
-	  WHERE order_detail_id = #{order_detail_id}
+	  WHERE order_id = #{order_id}
 	</select>
 	<select id="getNameByProductId" resultType="string">
 	  SELECT product_id, product_name
@@ -63,19 +76,28 @@
 		values 
 		(adminsale_seq.nextval,#{store_name}, sysdate, sysdate, #{sale_name}, #{price}, #{a_code}, #{b_code}, 'YES') 
 	</insert>
+	<select id="getIngClassId" parameterType="String" resultType="SalesDto">
+	  SELECT class_id, price, status 
+	  FROM tb_class 
+	  WHERE status = #{status}
+	</select>
 	<select id="getProfitByClassId" resultType="int">
 	  SELECT sc.class_id, COUNT(*) as student_count, c.price, COUNT(*)*c.price as profit  
 	  FROM tb_student_class sc
 	  Inner Join tb_class c on sc.class_id=c.class_id
 	  WHERE sc.class_id= #{class_id}
 	  group by sc.class_id
-	</select>>
+	</select>
 	<select id="getNameByClassId" resultType="string">
 	  SELECT class_name 
 	  FROM tb_class 
 	  WHERE class_id = #{class_id}
 	</select>
 	
-
+	<select id="getAdminProfitStatByYear" parameterType="String" resultType="int">
+	  SELECT order_id, total_price, status 
+	  FROM tb_order 
+	  WHERE status = #{status}
+	</select>
 	
 </mapper>
