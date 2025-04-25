@@ -26,6 +26,9 @@ function SalesManage() {
             setHideSubCondition(false);  // 다른 조건을 선택한 경우 서브 조건 숨기기
         }
     };
+    useEffect(()=>{
+
+    },[])
     const handleSelectSub = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedSub(e.target.value)
         console.log(selectedSub)
@@ -61,10 +64,21 @@ function SalesManage() {
         setTitle("매출 수정")
         setBtnTag("수정")
     };
+
     useEffect(() => {
         console.log("선택된 값: ", selected, selectedSub);
     }, [selected, selectedSub]);  // selected 값이 변경될 때마다 이 코드가 실행됩니다.
-
+    const [checkedItems, setCheckedItems] = useState<string[]>([]);
+    const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { value, checked } = e.target;
+    
+        setCheckedItems(prev =>
+            checked ? [...prev, value] : prev.filter(item => item !== value)
+        );
+    };
+    const handleSearch=()=>{
+        console.log("체크된 항목들:", checkedItems);
+    }
     return (
         <Layout currentMenu="salesmanage">
             <AdminSalesModal show={modalShow} title={title} btnTag={btnTag} onBtn={onBtn} 
@@ -75,12 +89,12 @@ function SalesManage() {
                 <div className="d-flex justify-content-between align-items-center mb-3 row">
                     <div className="col-md-8 col-12 d-flex justify-content-between align-items-center">
                         <Form className='d-flex w-100'>
-                            <Form.Check inline label="수업료 수입" name="group1" type="checkbox" id={`inline-checkbox-1`}/>
-                            <Form.Check inline label="기타 수입" name="group1" type="checkbox" id={`inline-checkbox-2`}/>
-                            <Form.Check inline label="강사 월급" name="group1" type="checkbox" id={`inline-checkbox-3`}/>
-                            <Form.Check inline label="발주 비용" name="group1" type="checkbox" id={`inline-checkbox-3`}/>
-                            <Form.Check inline label="기타 지출" name="group1" type="checkbox" id={`inline-checkbox-3`}/>
-                            <Button className='btn btn-secondary' size="sm" style={{ width: "50px" }}>검색</Button>
+                            <Form.Check inline label="수업료 수입" value="CLS" type="checkbox" id="CLS"onChange={handleCheckboxChange}/>
+                            <Form.Check inline label="기타 수입" value="ETC" type="checkbox" id="ETC" onChange={handleCheckboxChange}/>
+                            <Form.Check inline label="강사 월급" value="SALARY" type="checkbox" id="SALARY" onChange={handleCheckboxChange}/>
+                            <Form.Check inline label="발주 비용" value="ITEM" type="checkbox" id="ITEM" onChange={handleCheckboxChange}/>
+                            <Form.Check inline label="기타 지출" value="C_ETC" type="checkbox" id="C_ETC" onChange={handleCheckboxChange}/>
+                            <Button className='btn btn-secondary' size="sm" style={{ width: "50px" }} onClick={handleSearch}>검색</Button>
                         </Form>
                     </div>
                     <div className='col-md-4 col-12 d-flex justify-content-end mt-3 mt-md-0'>

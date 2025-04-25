@@ -45,7 +45,7 @@ function NavBar({currentMenu}) {
                             <a href="#" onClick={() => handleSubMenuClick('salesManage', '/salesManage')}>매출관리</a>
                         </li>
                         <li className={currentMenu==='salesstat'?'active':''}>
-                            <a href="#" onClick={() => handleSubMenuClick('salesStat', '/salesStatus')}>매출현황</a>
+                            <a href="#" onClick={() => handleSubMenuClick('salesStat', '/salesStatus')}>매출통계</a>
                         </li>
                     </ul>
                 </li>
