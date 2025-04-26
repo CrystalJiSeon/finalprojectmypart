@@ -17,7 +17,13 @@ interface Sales{
 }
 function SalesManage() {
     const [teacher, setTeacher] = useState(["강사1", "강사2","강사3"])
-    const [bcode, setBcodeList] = useState(["수업료 수입", "기타 수입", "강사 월급", "발주 비용", "기타 지출"])
+    const [bcode, setBcodeList] = useState([
+        { class: "수입", detail: "수업료 수입" },
+        { class: "수입", detail: "기타 수입" },
+        { class: "지출", detail: "강사 월급" },
+        { class: "지출", detail: "발주 비용" },
+        { class: "지출", detail: "기타 지출" }
+      ]);
     const [acode, setAcodeList] = useState(["수입", "지출"])
     const B_CODE_MAP: { [key: string]: string } = {
         "CLS": "수업료 수입",

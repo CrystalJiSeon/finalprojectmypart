@@ -7,12 +7,12 @@ import React from 'react';
 type Student = {id:number, name:string}
 function AdminSalesModal({show, title, btnTag, onBtn, onClose, bcode, acode}) {
     const [sdate, setSDate] = useState('');
-    const [selectedLecture, setSelectedLecture] = useState('');
-    const [selectedClass, setSelectedClass] = useState('');
+    const [selectedBCode, setSelectedBCode] = useState('');
+    const [selectedACode, setSelectedACode] = useState('');
     const [salesAmount, setSalesAmount] = useState(0);
     const [studentName, setStudentName] = useState<string>('');
 
- 
+    const filteredBcode = bcode.filter(item => item.class === selectedACode);
 
     return (
         <>
@@ -25,7 +25,10 @@ function AdminSalesModal({show, title, btnTag, onBtn, onClose, bcode, acode}) {
                     <Form.Group>
                         <Form.Group className="mb-3" controlId="lecture">
                             <Form.Label>구분</Form.Label>
-                            <Form.Select onChange={((e)=>setSelectedClass(e.target.value))}>
+                            <Form.Select onChange={((e)=>{
+                                    setSelectedACode(e.target.value)
+                                    setSelectedBCode('')
+                            })}>
                                 <option value="">구분</option>
                                 {acode.map((item, index) => (
                                     <option key={index} value={item}>{item}</option>
@@ -34,10 +37,10 @@ function AdminSalesModal({show, title, btnTag, onBtn, onClose, bcode, acode}) {
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="teacher">
                             <Form.Label>구분 상세</Form.Label>
-                            <Form.Select onChange={((e)=>setSelectedLecture(e.target.value))}>
+                            <Form.Select onChange={(e)=>{setSelectedBCode(e.target.value); }}>
                                 <option value="">구분 상세</option>
-                                {bcode.map((item, index) => (
-                                    <option key={index} value={item}>{item}</option>
+                                {filteredBcode.map((item, index) => (
+                                    <option key={index} value={item.detail}>{item.detail}</option>
                                 ))}
                             </Form.Select>
                         </Form.Group>
@@ -52,7 +55,7 @@ function AdminSalesModal({show, title, btnTag, onBtn, onClose, bcode, acode}) {
                     </Form.Group>      
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button onClick={()=>{onBtn({sdate,selectedLecture,selectedClass,salesAmount,studentName})}}>{btnTag}</Button>
+                    <Button onClick={()=>{onBtn({sdate,selectedBCode,selectedACode,salesAmount,studentName})}}>{btnTag}</Button>
                 </Modal.Footer>
             </Modal>
         </>
