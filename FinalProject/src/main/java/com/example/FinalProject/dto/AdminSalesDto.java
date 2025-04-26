@@ -23,7 +23,7 @@ public class AdminSalesDto {
 	private int price;//항목 금액
 	private String a_code;//구분코드 : 수입/지출
 	private String b_code;//상세구분코드 : 수업료수입, 기타수입,강사월급, 발주비용, 기타지출
-	private List<String> b_codes;//검색조건
+	private List<String> Search;//검색조건
 	private String auto;//default: yes(발주나 수업에서 처리됨), no: 담당자가 직접 입력
 	private int startRowNum;
 	private int endRowNum;

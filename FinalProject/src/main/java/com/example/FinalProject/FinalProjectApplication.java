@@ -7,7 +7,7 @@ import org.springframework.context.annotation.PropertySource;
 
 @SpringBootApplication
 @PropertySource("classpath:custom.properties")
-@MapperScan("com.example.FinalProject.mappers")
+
 @MapperScan("com.example.FinalProject.mapper")
 public class FinalProjectApplication {
 

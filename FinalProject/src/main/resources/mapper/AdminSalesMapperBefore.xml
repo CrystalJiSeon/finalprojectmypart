@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.FinalProject.mapper.SalesMapper">
+	
+	<select id="getListDaily" resultType="AdminSalesDto">
+		SELECT To_char(sales_date, 'YYYY-MM-DD') as sday, TO_CHAR(sales_date, 'YYYY-MM') AS smonth,
+      		   sales_amount as dailySales
+		FROM Sales
+		where smonth ="smonth"
+		order by sday asc
+	</select>
+	<select id="getListMonthly" resultType="AdminSalesDto">
+		SELECT TO_CHAR(sales_date, 'YYYY-MM') AS smonth,
+      		   SUM(sales_amount) AS monthlySales
+		FROM Sales
+		where to_char(sales_date, 'YYYY') as syear = #{syear}
+		GROUP BY TO_CHAR(sales_date, 'YYYY-MM') smonth
+		order by smonth asc
+	</select>
+	<select id="getListYearly" resultType="AdminSalesDto">
+		SELECT TO_CHAR(sales_date, 'YYYY') AS syear,
+	        	SUM(sales_amount) AS yearlySales
+		FROM Sales
+		GROUP BY TO_CHAR(sales_date, 'YYYY') syear
+		Order by syear asc
+	</select>
+	
+	
+	<select id="getYearlyByClass" resultType="AdminSalesDto">
+		SELECT TO_CHAR(sales_date, 'YYYY') AS syear,
+	        	SUM(sales_amount) AS yearlySales
+		from SALES
+		group by class_id
+		order by lecture_id asc
+	</select>
+	<select id="getMonthlyByClass" resultType="AdminSalesDto">
+		SELECT TO_CHAR(sales_date, 'YYYY-MM') AS smonth,
+      		   SUM(sales_amount) AS monthlySales
+		from SALES
+		group by class_id
+		order by lecture_id asc
+	</select>
+	
+	
+	<select id="getYearlyByLecutre" resultType="AdminSalesDto">
+		SELECT TO_CHAR(sales_date, 'YYYY') AS syear,
+	        	SUM(sales_amount) AS yearlySales
+		from SALES
+		group by lecture_id
+		order by class_id asc
+	</select>
+	<select id="getMonthlyByLecture" resultType="AdminSalesDto">
+		SELECT TO_CHAR(sales_date, 'YYYY-MM') AS smonth,
+      		   SUM(sales_amount) AS monthlySales
+		from SALES
+		group by lecture_id
+		order by class_id asc
+	</select>
+	
+	
+	<select id="getListHalfByYear" resultType="AdminSalesDto">
+		SELECT
+			case when extract(month from sales_date) between 1 and 6 then 'firsthalf' else 'secondhalf' end as period,
+			sum(sales_amount) as total
+		FROM Sales
+		group by extract(year from sales_date), 
+			case when extract(month from sales_date) between 1 and 6 then 'firsthalf' else 'secondhalf' end
+		order by year, period
+	</select>
+	<select id="getListHalfByClass" resultType="AdminSalesDto">
+		SELECT
+			case when extract(month from sales_date) between 1 and 6 then 'firsthalf' else 'secondhalf' end as period,
+			sum(sales_amount) as total
+		FROM Sales
+		group by class_id, 
+			case when extract(month from sales_date) between 1 and 6 then 'firsthalf' else 'secondhalf' end
+		order by year, period
+	</select>
+	<select id="getListHalfByLecture" resultType="AdminSalesDto">
+		SELECT
+			case when extract(month from sales_date) between 1 and 6 then 'firsthalf' else 'secondhalf' end as period,
+			sum(sales_amount) as total
+		FROM Sales
+		group by lecture_id, 
+			case when extract(month from sales_date) between 1 and 6 then 'firsthalf' else 'secondhalf' end
+		order by year, period
+	</select>
+	
+	
+	<select id="getListCost" resultType="AdminSalesDto">
+		SELECT t.name teachername, t.teacher_id, t.salary*Floor((c.end_date-c.start_date)/30) as sal
+		FROM Teacher t
+		join class c on t.teacher_id = c.teacher_id
+		order by t.name asc
+	</select>
+	
+	
+	<insert id="insert" parameterType = "AdminSalesDto">
+		insert into sales(sales_id, storenum, class_id,lecture_id,student_id,sales_date,sales_amount) 
+		values (sales_seq.nextval, #{storenum}, #{class_id}, #{lecture_id}, #{student_id} #{sales_date}, #{sales_amount})
+	</insert>
+	<update id="update" parameterType="AdminSalesDto">
+		update sales
+		set class_id=#{class_id}, lecture_id=#{lecture_id}, student_id=#{student_id}
+		 	sales_date=#{sales_date}, updatedat=sysdate, sales_amount=#{sales_amount}
+		where sales_id=#{sales_id}
+	</update>
+	<delete id="delete" parameterType="int">
+		delete from sales
+		where sales_id=#{sales_id}
+		
+	</delete>
+	
+	<select id="getPrice" parameterType="int" resultType="int">
+		select price 
+		from lecture
+		where lecture_id = #{lecture_id}
+	</select>
+	<select id="getLectureId" parameterType="int" resultType="int">
+		select lecture_id=#{lecture_id} 
+		from class
+		where class_id = #{class_id}
+	</select>
+	<select id="getStorenum" parameterType="String" resultType="int">
+		select storenum from users
+		where username= #{username}
+	</select>
+</mapper>

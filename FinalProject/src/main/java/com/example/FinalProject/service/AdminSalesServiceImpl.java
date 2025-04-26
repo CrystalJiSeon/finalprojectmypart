@@ -6,12 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.FinalProject.dto.AdminSalesDto;
-import com.example.FinalProject.mapper.AdminSalesMapper;
+import com.example.FinalProject.mapper.AdminSalesMapperBefore;
 
 @Service
 public class AdminSalesServiceImpl implements AdminSalesService{
 
-	@Autowired AdminSalesMapper mapper;
+	@Autowired AdminSalesMapperBefore mapper;
 	@Override
 	public int addSales(AdminSalesDto dto) {
 		

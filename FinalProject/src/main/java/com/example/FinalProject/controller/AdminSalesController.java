@@ -17,10 +17,11 @@ public class AdminSalesController {
 	@Autowired SalesService salesservice;
 	
 	@GetMapping("/sales")
-	public List<AdminSalesDto> salesList(@RequestParam(defaultValue="1") int pageNum, AdminSalesDto dto) {
+	public List<AdminSalesDto> salesList(
+			@RequestParam(required = false) String store_name,
+		    @RequestParam(required = false) List<String> b_codes) {
 		
-		System.out.println(dto);
-		return salesservice.getAdminSalesList(dto.getStore_name(), dto.getB_codes());
+		return salesservice.getAdminSalesList(store_name,b_codes);
 	}
 	
 }

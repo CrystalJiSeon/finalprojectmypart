@@ -1,13 +1,16 @@
 package com.example.FinalProject.service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.FinalProject.dto.AdminSalesDto;
-import com.example.FinalProject.mapper.SalesMapper;
+import com.example.FinalProject.mapper.AdminSalesMapper;
 
 @Service
 public class SalesSerivceImpl implements SalesService{
@@ -17,13 +20,40 @@ public class SalesSerivceImpl implements SalesService{
 	final int PAGE_DISPLAY_COUNT=10;
 	
 	
-	@Autowired SalesMapper salesmapper;
+	@Autowired AdminSalesMapper salesmapper;
+	
+	private static final Map<String, String> codeMap = Map.of(
+		    "수업료 수입", "CLS",
+		    "기타 수입", "C_ETC",
+		    "강사 월급", "SALARY",
+		    "발주 비용", "ITEM",
+		    "기타 지출", "ETC"
+		);
+	
 	//매출 관리 리스트 : 검색 조건을 받아 일단은 리스트 불러오기(페이징 처리 해야함)
-	public List<AdminSalesDto>  getAdminSalesList(String store_name, List<String> b_codes) {
-		Map<String,Object> search = Map.of("store_name", store_name, "b_codes", b_codes);
-		return salesmapper.getAdminSalesList(search);
+	public List<AdminSalesDto> getAdminSales() {
+	    return salesmapper.getAdminSales();
+	}
+	
+	public List<AdminSalesDto> getAdminSalesList(String store_name, List<String> b_codes) {
+	    if(b_codes==null) {
+	    	return salesmapper.getAdminSales();
+	    }else{
+	    	Map<String, Object> search = new HashMap<>();
+		    search.put("store_name", store_name);
+		    // b_codes가 있으면 매핑 후 조건 추가
+		    List<String> mappedCodes = b_codes.stream()
+		        .map(codeMap::get)
+		        .filter(Objects::nonNull)
+		        .collect(Collectors.toList());
 
-	}	
+		    search.put("b_codes", mappedCodes);
+
+		    return salesmapper.getAdminSalesList(search);
+	    }
+
+	}
+
 	
 	
 //	@Override

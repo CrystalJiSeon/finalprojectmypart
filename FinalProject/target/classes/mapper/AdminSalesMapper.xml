@@ -1,128 +1,109 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.example.FinalProject.mapper.SalesMapper">
-	
-	<select id="getListDaily" resultType="AdminSalesDto">
-		SELECT To_char(sales_date, 'YYYY-MM-DD') as sday, TO_CHAR(sales_date, 'YYYY-MM') AS smonth,
-      		   sales_amount as dailySales
-		FROM Sales
-		where smonth ="smonth"
-		order by sday asc
+<mapper namespace="com.example.FinalProject.mapper.AdminSalesMapper">
+
+	<select id="getAdminSales" resultType="AdminSalesDto">
+	  SELECT admin_sale_id, store_name, TO_CHAR(cre_date, 'YYYY-MM-DD') AS cre_date, TO_CHAR(edit_date, 'YYYY-MM-DD') AS edit_date, sale_name, price, a_code, b_code, auto
+	  FROM tb_admin_sale
+	  ORDER BY cre_date DESC
 	</select>
-	<select id="getListMonthly" resultType="AdminSalesDto">
-		SELECT TO_CHAR(sales_date, 'YYYY-MM') AS smonth,
-      		   SUM(sales_amount) AS monthlySales
-		FROM Sales
-		where to_char(sales_date, 'YYYY') as syear = #{syear}
-		GROUP BY TO_CHAR(sales_date, 'YYYY-MM') smonth
-		order by smonth asc
+
+	<select id="getAdminSalesList" parameterType="map" resultType="AdminSalesDto">
+	    SELECT *
+	    FROM sales
+	    WHERE 1=1
+	    <if test="store_name != null and store_name != ''">
+	        AND store_name LIKE CONCAT('%', #{store_name}, '%')
+	    </if>
+	    <if test="b_codes != null and b_codes.size() > 0">
+	        AND b_code IN
+	        <foreach item="b_code" collection="b_codes" open="(" separator="," close=")">
+	            #{b_code}
+	        </foreach>
+	    </if>
 	</select>
-	<select id="getListYearly" resultType="AdminSalesDto">
-		SELECT TO_CHAR(sales_date, 'YYYY') AS syear,
-	        	SUM(sales_amount) AS yearlySales
-		FROM Sales
-		GROUP BY TO_CHAR(sales_date, 'YYYY') syear
-		Order by syear asc
+	<select id="getCount" parameterType="AdminSalesDto" resultType="int">
+		select nvl(max(rownum),0)
+		from tb_admin_sale 
+		<where>
+	    store_name = #{store_name}
+	    <if test="b_codes != null and bcodes.size() > 0">
+	      AND b_codes IN
+	      <foreach item="b_code" collection="b_codes" open="(" separator="," close=")">
+	        #{b_codes}
+	      </foreach>
+	    </if>
+	  </where>
 	</select>
-	
-	
-	<select id="getYearlyByClass" resultType="AdminSalesDto">
-		SELECT TO_CHAR(sales_date, 'YYYY') AS syear,
-	        	SUM(sales_amount) AS yearlySales
-		from SALES
-		group by class_id
-		order by lecture_id asc
+	<select id="getAdminSaleById" parameterType="int" resultType="SalesDto">
+		select * from tb_admin_sale
+		where adminsale_id=#{adminsale_id}
 	</select>
-	<select id="getMonthlyByClass" resultType="AdminSalesDto">
-		SELECT TO_CHAR(sales_date, 'YYYY-MM') AS smonth,
-      		   SUM(sales_amount) AS monthlySales
-		from SALES
-		group by class_id
-		order by lecture_id asc
-	</select>
-	
-	
-	<select id="getYearlyByLecutre" resultType="AdminSalesDto">
-		SELECT TO_CHAR(sales_date, 'YYYY') AS syear,
-	        	SUM(sales_amount) AS yearlySales
-		from SALES
-		group by lecture_id
-		order by class_id asc
-	</select>
-	<select id="getMonthlyByLecture" resultType="AdminSalesDto">
-		SELECT TO_CHAR(sales_date, 'YYYY-MM') AS smonth,
-      		   SUM(sales_amount) AS monthlySales
-		from SALES
-		group by lecture_id
-		order by class_id asc
-	</select>
-	
-	
-	<select id="getListHalfByYear" resultType="AdminSalesDto">
-		SELECT
-			case when extract(month from sales_date) between 1 and 6 then 'firsthalf' else 'secondhalf' end as period,
-			sum(sales_amount) as total
-		FROM Sales
-		group by extract(year from sales_date), 
-			case when extract(month from sales_date) between 1 and 6 then 'firsthalf' else 'secondhalf' end
-		order by year, period
-	</select>
-	<select id="getListHalfByClass" resultType="AdminSalesDto">
-		SELECT
-			case when extract(month from sales_date) between 1 and 6 then 'firsthalf' else 'secondhalf' end as period,
-			sum(sales_amount) as total
-		FROM Sales
-		group by class_id, 
-			case when extract(month from sales_date) between 1 and 6 then 'firsthalf' else 'secondhalf' end
-		order by year, period
-	</select>
-	<select id="getListHalfByLecture" resultType="AdminSalesDto">
-		SELECT
-			case when extract(month from sales_date) between 1 and 6 then 'firsthalf' else 'secondhalf' end as period,
-			sum(sales_amount) as total
-		FROM Sales
-		group by lecture_id, 
-			case when extract(month from sales_date) between 1 and 6 then 'firsthalf' else 'secondhalf' end
-		order by year, period
-	</select>
-	
-	
-	<select id="getListCost" resultType="AdminSalesDto">
-		SELECT t.name teachername, t.teacher_id, t.salary*Floor((c.end_date-c.start_date)/30) as sal
-		FROM Teacher t
-		join class c on t.teacher_id = c.teacher_id
-		order by t.name asc
-	</select>
-	
-	
-	<insert id="insert" parameterType = "AdminSalesDto">
-		insert into sales(sales_id, storenum, class_id,lecture_id,student_id,sales_date,sales_amount) 
-		values (sales_seq.nextval, #{storenum}, #{class_id}, #{lecture_id}, #{student_id} #{sales_date}, #{sales_amount})
+	<insert id="insertAdminSales" parameterType="SalesDto">
+		insert into tb_admin_sale
+		(adminsale_id, store_name, cre_date, edit_date, sale_name, price, a_code, b_code, auto)
+		values 
+		(adminsale_seq.nextval, #{store_name}, sysdate, sysdate, #{sale_name}, #{price}, #{a_code}, #{b_code}, 'NO' )				
 	</insert>
-	<update id="update" parameterType="AdminSalesDto">
-		update sales
-		set class_id=#{class_id}, lecture_id=#{lecture_id}, student_id=#{student_id}
-		 	sales_date=#{sales_date}, updatedat=sysdate, sales_amount=#{sales_amount}
-		where sales_id=#{sales_id}
+	<update id="editAdminSales">
+		update tb_admin_sale
+		set (store_name=#{store_name}, edit_date=sysdate, sale_name=#{sale_name}, 
+		     price=#{price}, a_code=#{a_code}, b_code=#{b_code}, auto='NO')
+		where adminsale_id=#{adminsale_id}
 	</update>
-	<delete id="delete" parameterType="int">
-		delete from sales
-		where sales_id=#{sales_id}
-		
+	<delete id="deleteAdminSales">
+		delete from tb_admin_sale
+		where adminsale_id=#{adminsale_id}
 	</delete>
+	<insert id="insertOrderApprovedCost">
+		insert into tb_admin_sale
+		(adminsale_id, store_name,cre_date,edit_date, sale_name,price, a_code, b_code,auto)
+		values 
+		(adminsale_seq.nextval,#{store_name}, sysdate, sysdate, #{sale_name}, #{price}, #{a_code}, #{b_code}, 'YES') 
+	</insert>
+	<select id="getApprovedOrderId" parameterType="String" resultType="int">
+	  SELECT order_id
+	  FROM tb_order 
+	  WHERE status = #{status}
+	</select>
+	<select id="getOrderDetailByOrderId" resultType="int">
+	  SELECT order_detail_id, product_id, quantity, price, quantity*price as calprice
+	  FROM tb_order_detail 
+	  WHERE order_id = #{order_id}
+	</select>
+	<select id="getNameByProductId" resultType="string">
+	  SELECT product_id, product_name
+	  FROM tb_class 
+	  WHERE product_id = #{product_id}
+	</select>
+	<insert id="insertClsIngProfit">
+		insert into tb_admin_sale
+		(adminsale_id, store_name,cre_date,edit_date, sale_name,price, a_code, b_code,auto)
+		values 
+		(adminsale_seq.nextval,#{store_name}, sysdate, sysdate, #{sale_name}, #{price}, #{a_code}, #{b_code}, 'YES') 
+	</insert>
+	<select id="getIngClassId" parameterType="String" resultType="SalesDto">
+	  SELECT class_id, price, status 
+	  FROM tb_class 
+	  WHERE status = #{status}
+	</select>
+	<select id="getProfitByClassId" resultType="int">
+	  SELECT sc.class_id, COUNT(*) as student_count, c.price, COUNT(*)*c.price as profit  
+	  FROM tb_student_class sc
+	  Inner Join tb_class c on sc.class_id=c.class_id
+	  WHERE sc.class_id= #{class_id}
+	  group by sc.class_id
+	</select>
+	<select id="getNameByClassId" resultType="string">
+	  SELECT class_name 
+	  FROM tb_class 
+	  WHERE class_id = #{class_id}
+	</select>
 	
-	<select id="getPrice" parameterType="int" resultType="int">
-		select price 
-		from lecture
-		where lecture_id = #{lecture_id}
+	<select id="getAdminProfitStatByYear" parameterType="String" resultType="int">
+	  SELECT order_id, total_price, status 
+	  FROM tb_order 
+	  WHERE status = #{status}
 	</select>
-	<select id="getLectureId" parameterType="int" resultType="int">
-		select lecture_id=#{lecture_id} 
-		from class
-		where class_id = #{class_id}
-	</select>
-	<select id="getStorenum" parameterType="String" resultType="int">
-		select storenum from users
-		where username= #{username}
-	</select>
+	
 </mapper>
