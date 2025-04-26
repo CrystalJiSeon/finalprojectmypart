@@ -2,37 +2,54 @@ import React, { MouseEvent, useEffect, useState } from 'react';
 import AdminSalesModal from './AdminSalesModal';
 import { Button, Form } from 'react-bootstrap';
 import axios from 'axios';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, useSearchParams } from 'react-router-dom';
 import ReactDOM from 'react-dom/client';
 import Layout from '../Layout';
+import api from '../../api';
 
+interface Sales{
+    cre_date:string;
+    edit_date:string;
+    sale_name:string;
+    price:number;
+    a_code:string;
+    b_code:string;
+}
 function SalesManage() {
     const [teacher, setTeacher] = useState(["강사1", "강사2","강사3"])
     const [bcode, setBcodeList] = useState(["수업료 수입", "기타 수입", "강사 월급", "발주 비용", "기타 지출"])
     const [acode, setAcodeList] = useState(["수입", "지출"])
+    const B_CODE_MAP: { [key: string]: string } = {
+        "CLS": "수업료 수입",
+        "ETC": "기타 수입",
+        "SALARY": "강사 월급",
+        "ITEM": "발주 비용",
+        "C_ETC": "기타 지출"
+    };
     const [modalShow, setModalShow] = useState(false);
     const [title, setTitle] = useState("매출 추가");
     const [btnTag, setBtnTag] = useState("추가")
     const [onBtn, setOnBtn] = useState(()=>{ })
     const [selected, setSelected] = useState("")
     const [selectedSub, setSelectedSub]=useState("");
-    const [hideSubCondition, setHideSubCondition] = useState(true);
-    const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelected(e.target.value)
-        console.log(selected)
-        if (e.target.value === "condition") {
-            setHideSubCondition(true);  // "학생이름"을 선택한 경우 서브 조건 보이기
-        } else {
-            setHideSubCondition(false);  // 다른 조건을 선택한 경우 서브 조건 숨기기
-        }
-    };
-    useEffect(()=>{
+    const [salesList, setSalesList]=useState<Sales[]>([]);
+    const [params, setParams] = useSearchParams({
+        search:[],
+        store_name:""
+    });
 
+    useEffect(()=>{
+        api.get(`/sales`)
+        .then(res=>{
+            const mappedData = (res.data as Sales[]).map(item => ({
+                ...item,
+                b_code: B_CODE_MAP[item.b_code] || item.b_code // 못찾으면 원래 값
+            }));
+            setSalesList(mappedData);
+        })
+        .catch(error=>console.log(error));
     },[])
-    const handleSelectSub = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedSub(e.target.value)
-        console.log(selectedSub)
-    };
+
     const handleAddSales = async(data:{
         sdate:string;
         selectedLecture: string;
@@ -42,7 +59,7 @@ function SalesManage() {
         studentName:string;
     })=>{
         try{
-            const res = await axios.post("/api/sales",data)
+            const res = await api.post("/sales",data)
             console.log(data)
             alert("매출이 추가되었습니다")
             
@@ -116,30 +133,34 @@ function SalesManage() {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr className="table-hover">
-                                <td>2025-04-10</td>
-                                <td>2025-04-10</td>
-                                <td>강사 홍길동 월급</td>
-                                <td>3000000</td>
-                                <td>지출</td>
-                                <td>강사월급</td>
-                                <td>
-                                    <button onClick={handleUpdate} className="btn btn-sm btn-outline-primary">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">
-                                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                                            <path fillRule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
-                                        </svg>
-                                    </button>
-                                </td>
-                                <td>
-                                    <button className="btn btn-sm btn-outline-danger">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-trash" viewBox="0 0 16 16">
-                                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-                                            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
-                                        </svg>
-                                    </button>
-                                </td>
-                            </tr>
+                            {salesList.map((item,index)=>(
+                                <tr className="table-hover" key={index}>
+                                    <td>{item.cre_date}</td>
+                                    <td>{item.edit_date}</td>
+                                    <td>{item.sale_name}</td>
+                                    <td>{item.price}</td>
+                                    <td>{item.a_code}</td>
+                                    <td>{item.b_code}</td>
+                                    <td>
+                                        <button onClick={handleUpdate} className="btn btn-sm btn-outline-primary">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">
+                                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                                <path fillRule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+                                            </svg>
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button className="btn btn-sm btn-outline-danger">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-trash" viewBox="0 0 16 16">
+                                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                                                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                                            </svg>
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                                 
+                            }                           
                         </tbody>
                     </table>
                 </div>

@@ -19,8 +19,6 @@ function App() {
             <Route path="/salesStatus" element={<SalesStatus/>}/>
           </Routes>
     </BrowserRouter>
-    
-
   );
 }
 
