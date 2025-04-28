@@ -2,13 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.FinalProject.mapper.AdminSalesMapper">
 
-	<select id="getAdminSales" resultType="AdminSalesDto">
+	<select id="getAdminSales" resultType="AdminSalesListDto">
 	  SELECT admin_sale_id, store_name, TO_CHAR(cre_date, 'YYYY-MM-DD') AS cre_date, TO_CHAR(edit_date, 'YYYY-MM-DD') AS edit_date, sale_name, price, a_code, b_code, auto
 	  FROM tb_admin_sale
 	  ORDER BY cre_date DESC
 	</select>
 
-	<select id="getAdminSalesList" parameterType="map" resultType="AdminSalesDto">
+	<select id="getAdminSalesList" parameterType="map" resultType="AdminSalesListDto">
 	    SELECT *
 	    FROM sales
 	    WHERE 1=1
@@ -55,6 +55,7 @@
 		delete from tb_admin_sale
 		where adminsale_id=#{adminsale_id}
 	</delete>
+
 	<insert id="insertOrderApprovedCost">
 		insert into tb_admin_sale
 		(adminsale_id, store_name,cre_date,edit_date, sale_name,price, a_code, b_code,auto)
@@ -100,10 +101,53 @@
 	  WHERE class_id = #{class_id}
 	</select>
 	
-	<select id="getAdminProfitStatByYear" parameterType="String" resultType="int">
-	  SELECT order_id, total_price, status 
-	  FROM tb_order 
-	  WHERE status = #{status}
+
+	<select id="getSYear">
+		select to_CHAR(cre_date,'YYYY) syear, user_id
+		from tb_admin_sale 
+		where user_id =#{user_id}
+		group by to_char(cre_date,'YYYY')
 	</select>
-	
+	<select id="getSMonth">
+		select to_CHAR(cre_date,'YYYY') syear, to_char(cre_date, 'YYYY-MM') smonth, user_id
+		from tb_admin_sale 
+		where user_id=#{user_id} and to_char(cre_date,'YYYY')=#{syear}
+		group by to_char(cre_date,'MM')
+	</select>
+	<select id="getAdminProfitStatByYear" parameterType="String" resultType="int">
+	 	select to_CHAR(cre_date,'YYYY') syear, to_char(cre_date,'YYYY-MM') smonth, user_id, sum(price)
+	 	from tb_admin_sale	 	
+	 	where user_id=#{user_id} and a_codes='PROFIT' and to_char(cre_date, 'YYYY')=#{syear}
+	 	group by user_id, to_char(cre_date, 'YYYY-MM')
+	 	order by smonth
+	</select>
+	<select id="getAdminCostStatByYear" parameterType="String" resultType="int">
+	 	select to_CHAR(cre_date,'YYYY') syear, to_char(cre_date,'YYYY-MM') smonth, user_id, sum(price)
+	 	from tb_admin_sale	 	
+	 	where user_id=#{user_id} and a_codes='COST' and to_char(cre_date, 'YYYY')=#{syear}
+	 	group by user_id, to_char(cre_date, 'YYYY-MM')
+	 	order by smonth
+	</select>
+	<select id="getAdminSalesStatByLectYearly" parameterType="String" resultType="int">
+		SELECT 
+	        TO_CHAR(c.start_date, 'YYYY') AS syear, c.cd_lecture, b.bname AS lecture_name, COUNT(sc.student_id) AS student_count, c.price,                              
+	        COUNT(sc.student_id) * c.price AS total
+	    FROM tb_class c
+	    LEFT JOIN tb_student_class sc ON c.class_id = sc.class_id 
+	    LEFT JOIN tb_bcode b ON c.cd_lecture = b.bcode              
+	    WHERE c.user_id = #{user_id} AND b.acode = 'LECTURE' AND c.cd_status != 'CANCEL'
+	    GROUP BY c.cd_lecture, b.bname, c.price                  
+	    ORDER BY c.cd_lecture   
+	</select>
+	<select id="getAdminSalesStatByLectMonthly" parameterType="String" resultType="int">
+		SELECT 
+		    TO_CHAR(c.start_date, 'YYYY-MM') AS smonth, c.cd_lecture, b.bname AS lecture_name,
+		    COUNT(sc.student_id) AS student_count, c.price, COUNT(sc.student_id) * c.price AS total_revenue
+		FROM tb_class c
+		LEFT JOIN tb_student_class sc ON c.class_id = sc.class_id 
+		LEFT JOIN tb_bcode b ON c.cd_lecture = b.bcode
+		WHERE c.user_id = #{user_id}  AND b.acode = 'LECTURE' AND c.cd_status != 'CANCEL'
+		GROUP BY TO_CHAR(c.start_date, 'YYYY-MM'), c.cd_lecture, b.bname, c.price
+		ORDER BY sales_month, c.cd_lecture  
+	</select>
 </mapper>

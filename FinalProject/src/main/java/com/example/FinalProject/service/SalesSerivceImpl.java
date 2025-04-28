@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.FinalProject.dto.AdminSalesDto;
+import com.example.FinalProject.dto.AdminSalesListDto;
 import com.example.FinalProject.mapper.AdminSalesMapper;
 
 @Service
@@ -22,36 +23,37 @@ public class SalesSerivceImpl implements SalesService{
 	
 	@Autowired AdminSalesMapper salesmapper;
 	
-	private static final Map<String, String> codeMap = Map.of(
-		    "수업료 수입", "CLS",
-		    "기타 수입", "C_ETC",
-		    "강사 월급", "SALARY",
-		    "발주 비용", "ITEM",
-		    "기타 지출", "ETC"
-		);
 	
 	//매출 관리 리스트 : 검색 조건을 받아 일단은 리스트 불러오기(페이징 처리 해야함)
-	public List<AdminSalesDto> getAdminSales() {
+	public AdminSalesListDto getAdminSales() {
 	    return salesmapper.getAdminSales();
 	}
 	
-	public List<AdminSalesDto> getAdminSalesList(String store_name, List<String> b_codes) {
+	public AdminSalesListDto getAdminSalesList(int pageNum, int user_id, List<String> b_codes) {
 	    if(b_codes==null) {
+	    	System.out.println("b코드 null");
 	    	return salesmapper.getAdminSales();
 	    }else{
+	    	System.out.println("b코드 null 아님");
 	    	Map<String, Object> search = new HashMap<>();
-		    search.put("store_name", store_name);
+	    	search.put("pageNum", pageNum );
+		    search.put("user_id", user_id);
 		    // b_codes가 있으면 매핑 후 조건 추가
 		    List<String> mappedCodes = b_codes.stream()
-		        .map(codeMap::get)
 		        .filter(Objects::nonNull)
 		        .collect(Collectors.toList());
 
 		    search.put("b_codes", mappedCodes);
-
+		    
+		    System.out.println(mappedCodes);
 		    return salesmapper.getAdminSalesList(search);
 	    }
+	}
 
+	@Override
+	public List<String> bCodeArrayToStringList() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	

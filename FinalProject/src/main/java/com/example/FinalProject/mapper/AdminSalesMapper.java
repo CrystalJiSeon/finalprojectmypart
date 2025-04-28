@@ -7,14 +7,15 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.example.FinalProject.dto.AdminSalesDto;
+import com.example.FinalProject.dto.AdminSalesListDto;
 import com.example.FinalProject.dto.SalesDto;
 
 @Mapper
 public interface AdminSalesMapper {
 	//Admin 측
 	//지점번호와 bcode를 넣어서 수입/지출 리스트를 가져오기
-	List<AdminSalesDto> getAdminSalesList(Map<String, Object> search);//@Param("store_name") int store_name, @Param("b_codes") List<String> b_codes
-	List<AdminSalesDto> getAdminSales();
+	AdminSalesListDto getAdminSalesList(Map<String, Object> search);//@Param("store_name") int store_name, @Param("b_codes") List<String> b_codes
+	AdminSalesListDto getAdminSales();
 	int getCount(List<String> b_codes);
 	SalesDto getAdminSaleById(int adminsaleid);
 	int insertAdminSales(SalesDto dto);
@@ -32,6 +33,12 @@ public interface AdminSalesMapper {
 //	int countByClassId(@Param("classid") int classid);
 //	SalesDto getPriceByClassId(@Param("classid") int classid);
 	SalesDto getNameByClassId(@Param("class_id") int class_id);
+	
+	//통계 관련
+	//연도 불러오기
+	String getSYear();
+	//월 불러오기
+	String getSMonth();
 	//연도별 수입 데이터 불러오기
 	List<SalesDto> getAdminProfitStatByYear();
 	//연도별 지출 데이터 불러오기
