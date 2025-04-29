@@ -1,11 +1,12 @@
 import React, { MouseEvent, useEffect, useState } from 'react';
 import AdminSalesModal from './AdminSalesModal';
-import { Button, Form } from 'react-bootstrap';
+import { Button, Form, Pagination } from 'react-bootstrap';
 import axios from 'axios';
 import { BrowserRouter, useSearchParams } from 'react-router-dom';
 import ReactDOM from 'react-dom/client';
 import Layout from '../Layout';
 import api from '../../api';
+import { AdminSalesDto } from '../../types/AdminType';
 
 interface Sales{
     cre_date:string;
@@ -14,9 +15,12 @@ interface Sales{
     price:number;
     a_code:string;
     b_code:string;
+    b_codes:string[];
 }
+interface PageInfo {
+    list: AdminSalesDto[];
+  }
 function SalesManage() {
-    const [teacher, setTeacher] = useState(["강사1", "강사2","강사3"])
     const [bcode, setBcodeList] = useState([
         { class: "수입", detail: "수업료 수입" },
         { class: "수입", detail: "기타 수입" },
@@ -36,39 +40,31 @@ function SalesManage() {
     const [title, setTitle] = useState("매출 추가");
     const [btnTag, setBtnTag] = useState("추가")
     const [onBtn, setOnBtn] = useState(()=>{ })
-    const [selected, setSelected] = useState("")
-    const [selectedSub, setSelectedSub]=useState("");
     const [salesList, setSalesList]=useState<Sales[]>([]);
-    const [params, setParams] = useSearchParams({
-        search:[],
-        store_name:""
-    });
 
     useEffect(()=>{
-        api.get(`/sales`)
-        .then(res=>{
-            const mappedData = (res.data as Sales[]).map(item => ({
-                ...item,
-                b_code: B_CODE_MAP[item.b_code] || item.b_code // 못찾으면 원래 값
-            }));
-            setSalesList(mappedData);
-        })
-        .catch(error=>console.log(error));
+        console.log("useEffect는 실행됨")
+        //query 파라미터 값을 읽어와
+        //만일 존재 하지 않는다면 1 페이지로 설정
+        let pageNumStr = params.get("pageNum");
+        let pageNum = pageNumStr ? parseInt(pageNumStr) : 1;
+        handleSearch(pageNum);
     },[])
-
+    const move = (page: number) => {
+        setParams(prev => {
+            prev.set("pageNum", page.toString());
+            return prev;
+        });
+    };
     const handleAddSales = async(data:{
         sdate:string;
-        selectedLecture: string;
-        selectedClass: string;
-        selectedSalesAmount:number;
-        studentId?:number;
-        studentName:string;
+        selectedACode: string;
+        selectedBCode: string;
+        salesName:string;
+        price:number;
     })=>{
         try{
-            const res = await api.post("/sales",data)
-            console.log(data)
             alert("매출이 추가되었습니다")
-            
             setModalShow(false)
         }catch(error){
             console.error("매출 추가 실패:", error)
@@ -86,21 +82,80 @@ function SalesManage() {
         console.log(modalShow)
         setTitle("매출 수정")
         setBtnTag("수정")
-    };
-
-    useEffect(() => {
-        console.log("선택된 값: ", selected, selectedSub);
-    }, [selected, selectedSub]);  // selected 값이 변경될 때마다 이 코드가 실행됩니다.
+    }; 
     const [checkedItems, setCheckedItems] = useState<string[]>([]);
     const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { value, checked } = e.target;
-    
         setCheckedItems(prev =>
             checked ? [...prev, value] : prev.filter(item => item !== value)
         );
     };
-    const handleSearch=()=>{
-        console.log("체크된 항목들:", checkedItems);
+
+    const [params, setParams] = useSearchParams({
+        checkedItems:checkedItems,
+        store_name:"",
+        pageNum:"1"
+    })
+    
+    const [pageInfo, setPageInfo] = useState({
+        list:[]
+    });
+    
+    function listToQuery(list, paramName){
+        let query="";
+        for(let i=0; i<list.length; i++){
+            if(i==list.length-1){
+                query += `${paramName}=${list[i]}`;
+            }else{
+                query += `${paramName}=${list[i]}&`;
+            }
+        }
+        return query;
+    }
+    function range(start, end) {
+        const result = [];
+        for (let i = start; i <= end; i++) {
+            result.push(i);
+        }
+        return result;
+    }
+    const [pageArray, setPageArray]=useState([]);
+    const handleSearch=(pageNum :number)=>{
+       // console.log(checkedItems)
+       // const bCodeQuery= checkedItems.map(item=>`'${item}'`).join(',');
+        //console.log(bCodeQuery)
+        /*
+            /sales?b_codes=aaa&b_codes=bbb&b_codes=ccc ...
+        */
+        //테스트
+        /*
+        const data={
+            checkedItems:listToQuery(checkedItems, "checkedItems"),
+            store_name:params.get("store_name"),
+            pageNum:params.get("pageNum")
+        };
+        */
+        const query=listToQuery(checkedItems, "checkedItems");
+        console.log(query);
+        //console.log(data);
+        //api.get(`/sales?${query}&store_name=${params.get("store_name")}&pageNum=${params.get("pageNum")}`)
+        api.get(`/sales?${query}`,{
+            params:{
+                store_name:params.get("store_name"),
+                pageNum:params.get("pageNum")
+            }
+        })
+        .then(res=>{
+            console.log(res.data)
+            setPageInfo(res.data);
+            const mappedData = (res.data.list as Sales[]).map(item => ({
+                ...item,
+                b_code: B_CODE_MAP[item.b_code] || item.b_code // 못찾으면 원래 값
+            }));
+            setSalesList(mappedData);
+            setPageArray(range(res.data.startPageNum, res.data.endPageNum))
+        })
+        .catch(error=>console.log(error));
     }
     return (
         <Layout currentMenu="salesmanage">
@@ -125,7 +180,7 @@ function SalesManage() {
                     </div>
                 </div>
                 <div>
-                    <table className="table table-bordered responsive">
+                    <table className="table table-bordered responsive" style={{textAlign:"center"}}>
                         <thead className="table-light">
                             <tr>
                                 <th>매출등록일자</th>
@@ -169,6 +224,18 @@ function SalesManage() {
                             }                           
                         </tbody>
                     </table>
+                    <Pagination className='mt-3'>
+                        <Pagination.Item onClick={()=>move(pageInfo.startPageNum-1)} 
+                            disabled={pageInfo.startPageNum === 1}>Prev</Pagination.Item>
+                        {
+                            pageArray.map(item => 
+                                <Pagination.Item onClick={()=>move(item)} key={item}
+                                    active={pageInfo.pageNum === item}>{item}</Pagination.Item>
+                            )
+                        }
+                        <Pagination.Item onClick={()=>move(pageInfo.endPageNum+1)}
+                            disabled={pageInfo.endPageNum === pageInfo.totalPageCount}>Next</Pagination.Item>
+                    </Pagination> 
                 </div>
             </div>
         </Layout>
