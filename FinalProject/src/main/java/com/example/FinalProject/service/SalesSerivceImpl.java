@@ -25,38 +25,65 @@ public class SalesSerivceImpl implements SalesService{
 	
 	
 	//매출 관리 리스트 : 검색 조건을 받아 일단은 리스트 불러오기(페이징 처리 해야함)
-	public AdminSalesListDto getAdminSales() {
-	    return salesmapper.getAdminSales();
-	}
-	
-	public AdminSalesListDto getAdminSalesList(int pageNum, int user_id, List<String> b_codes) {
-	    if(b_codes==null) {
-	    	System.out.println("b코드 null");
-	    	return salesmapper.getAdminSales();
-	    }else{
-	    	System.out.println("b코드 null 아님");
-	    	Map<String, Object> search = new HashMap<>();
-	    	search.put("pageNum", pageNum );
-		    search.put("user_id", user_id);
-		    // b_codes가 있으면 매핑 후 조건 추가
-		    List<String> mappedCodes = b_codes.stream()
-		        .filter(Objects::nonNull)
-		        .collect(Collectors.toList());
 
-		    search.put("b_codes", mappedCodes);
-		    
-		    System.out.println(mappedCodes);
-		    return salesmapper.getAdminSalesList(search);
-	    }
+	public AdminSalesDto getAdminSalesList(int pageNum, String store_name, List<String> b_codes) {
+		//보여줄 페이지의 시작 ROWNUM
+		int startRowNum=1+(pageNum-1)*PAGE_ROW_COUNT;
+		//보여줄 페이지의 끝 ROWNUM
+		int endRowNum=pageNum*PAGE_ROW_COUNT;
+		
+		//하단 시작 페이지 번호 
+		int startPageNum = 1 + ((pageNum-1)/PAGE_DISPLAY_COUNT)*PAGE_DISPLAY_COUNT;
+		//하단 끝 페이지 번호
+		int endPageNum=startPageNum+PAGE_DISPLAY_COUNT-1;
+		//전체 글의 갯수
+		int totalRow;
+		if(b_codes==null) {
+			totalRow=salesmapper.getCountDefault();
+		}else {
+			Map<String, Object> search = new HashMap<>();
+			search.put("store_name", store_name);
+			search.put("b_codes", b_codes); // List<String>
+			totalRow=salesmapper.getCount(search);
+		}
+		//전체 페이지의 갯수 구하기
+		int totalPageCount=(int)Math.ceil(totalRow/(double)PAGE_ROW_COUNT);
+		//끝 페이지 번호가 이미 전체 페이지 갯수보다 크게 계산되었다면 잘못된 값이다.
+		if(endPageNum > totalPageCount){
+			endPageNum=totalPageCount; //보정해 준다. 
+		}
+		//startRownum과 endrownum을 PostDto 객체에 담아서 
+		
+
+    	// 검색 조건 및 페이징 정보를 Map에 담음
+    	Map<String, Object> search = new HashMap<>();
+    	search.put("store_name", store_name);
+    	search.put("b_codes", b_codes); // b_codes는 null일 수도 있음
+    	search.put("startRowNum", startRowNum);
+    	search.put("endRowNum", endRowNum);
+    	   // 리스트 가져오기 (페이징 포함, 조건 없으면 전체 조회이지만 LIMIT 적용됨)
+        List<AdminSalesDto> salesList = (b_codes == null || b_codes.isEmpty())
+            ? salesmapper.getAdminSales()
+            : salesmapper.getAdminSalesList(search);
+
+        // DTO에 값 설정해서 리턴
+        AdminSalesDto dto = new AdminSalesDto();
+        dto.setList(salesList);
+        dto.setPageNum(pageNum);
+        dto.setStartPageNum(startPageNum);
+        dto.setEndPageNum(endPageNum);
+        dto.setTotalPageCount(totalPageCount);
+        dto.setTotalRow(totalRow);
+        dto.setStartRowNum(startRowNum);
+        dto.setEndRowNum(endRowNum);
+
+        return dto;
+
 	}
 
-	@Override
-	public List<String> bCodeArrayToStringList() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	
+
+
 	
 //	@Override
 //	public void insertRevenueByClass(int classid, String storename, String acode, String bcode) {

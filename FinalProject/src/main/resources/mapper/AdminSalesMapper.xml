@@ -2,44 +2,56 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.FinalProject.mapper.AdminSalesMapper">
 
-	<select id="getAdminSales" resultType="AdminSalesListDto">
+	<select id="getAdminSales" resultType="AdminSalesDto">
 	  SELECT admin_sale_id, store_name, TO_CHAR(cre_date, 'YYYY-MM-DD') AS cre_date, TO_CHAR(edit_date, 'YYYY-MM-DD') AS edit_date, sale_name, price, a_code, b_code, auto
 	  FROM tb_admin_sale
 	  ORDER BY cre_date DESC
 	</select>
 
-	<select id="getAdminSalesList" parameterType="map" resultType="AdminSalesListDto">
+	<select id="getAdminSalesList" parameterType="map" resultType="AdminSalesDto">
 	    SELECT *
-	    FROM sales
-	    WHERE 1=1
-	    <if test="store_name != null and store_name != ''">
-	        AND store_name LIKE CONCAT('%', #{store_name}, '%')
-	    </if>
-	    <if test="b_codes != null and b_codes.size() > 0">
-	        AND b_code IN
-	        <foreach item="b_code" collection="b_codes" open="(" separator="," close=")">
-	            #{b_code}
-	        </foreach>
-	    </if>
+	    FROM (select result1.*, rownum as rnum
+	    	  from
+	    	  		(select admin_sale_id, store_name, TO_CHAR(cre_date, 'YYYY-MM-DD') AS cre_date, TO_CHAR(edit_date, 'YYYY-MM-DD') AS edit_date, sale_name, price, a_code, b_code, auto
+	    	  		 from tb_admin_sale
+		            <where>
+		                <if test="store_name != null and store_name != ''">
+		                    AND store_name LIKE '%' || #{store_name} || '%'
+		                </if>
+		                <if test="b_codes != null and b_codes.size() > 0">
+		                    AND b_code IN
+		                    <foreach item="b_code" collection="b_codes" open="(" separator="," close=")">
+		                        #{b_code}
+		                    </foreach>
+		                </if>
+		            </where>
+	    	  		 order by admin_sale_id) result1	    	  
+	    	  )
+	    where rnum between #{startRowNum} and #{endRowNum}
 	</select>
-	<select id="getCount" parameterType="AdminSalesDto" resultType="int">
-		select nvl(max(rownum),0)
-		from tb_admin_sale 
-		<where>
-	    store_name = #{store_name}
-	    <if test="b_codes != null and bcodes.size() > 0">
-	      AND b_codes IN
-	      <foreach item="b_code" collection="b_codes" open="(" separator="," close=")">
-	        #{b_codes}
-	      </foreach>
-	    </if>
-	  </where>
+	<select id="getCountDefault" resultType="int">
+	    SELECT COUNT(*) FROM tb_admin_sale
 	</select>
-	<select id="getAdminSaleById" parameterType="int" resultType="SalesDto">
+	<select id="getCount" parameterType="map" resultType="int">
+		  SELECT COUNT(*)
+		    FROM tb_admin_sale 
+		    <where>
+		        <if test="store_name != null and store_name != ''">
+		            AND store_name LIKE '%' || #{store_name} || '%'
+		        </if>
+		        <if test="b_codes != null and b_codes.size() > 0">
+		            AND b_code IN
+		            <foreach item="b_code" collection="b_codes" open="(" separator="," close=")">
+		                #{b_code}
+		            </foreach>
+		        </if>
+		    </where>
+	</select>
+	<select id="getAdminSaleById" parameterType="int" resultType="AdminSalesDto">
 		select * from tb_admin_sale
 		where adminsale_id=#{adminsale_id}
 	</select>
-	<insert id="insertAdminSales" parameterType="SalesDto">
+	<insert id="insertAdminSales" parameterType="AdminSalesDto">
 		insert into tb_admin_sale
 		(adminsale_id, store_name, cre_date, edit_date, sale_name, price, a_code, b_code, auto)
 		values 

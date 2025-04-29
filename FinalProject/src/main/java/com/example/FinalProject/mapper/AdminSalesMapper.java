@@ -14,9 +14,10 @@ import com.example.FinalProject.dto.SalesDto;
 public interface AdminSalesMapper {
 	//Admin 측
 	//지점번호와 bcode를 넣어서 수입/지출 리스트를 가져오기
-	AdminSalesListDto getAdminSalesList(Map<String, Object> search);//@Param("store_name") int store_name, @Param("b_codes") List<String> b_codes
-	AdminSalesListDto getAdminSales();
-	int getCount(List<String> b_codes);
+	List<AdminSalesDto> getAdminSalesList(Map<String, Object> search);//@Param("store_name") int store_name, @Param("b_codes") List<String> b_codes
+	List<AdminSalesDto> getAdminSales();
+	int getCountDefault();
+	int getCount(Map<String, Object> search);
 	SalesDto getAdminSaleById(int adminsaleid);
 	int insertAdminSales(SalesDto dto);
 	int editAdminSales(SalesDto dto);
