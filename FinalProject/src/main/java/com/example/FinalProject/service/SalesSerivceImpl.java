@@ -26,7 +26,7 @@ public class SalesSerivceImpl implements SalesService{
 	
 	//매출 관리 리스트 : 검색 조건을 받아 일단은 리스트 불러오기(페이징 처리 해야함)
 
-	public AdminSalesDto getAdminSalesList(int pageNum, String store_name, List<String> b_codes) {
+	public AdminSalesDto getAdminSalesList(int pageNum, Integer userId, List<String> checkedItems) {
 		//보여줄 페이지의 시작 ROWNUM
 		int startRowNum=1+(pageNum-1)*PAGE_ROW_COUNT;
 		//보여줄 페이지의 끝 ROWNUM
@@ -40,22 +40,14 @@ public class SalesSerivceImpl implements SalesService{
 		int totalRow;
 		// 검색 조건 및 페이징 정보를 Map에 담음
     	Map<String, Object> search = new HashMap<>();
-    	search.put("store_name", store_name);
-    	search.put("b_codes", b_codes); // b_codes는 null일 수도 있음
+    	search.put("userId", userId);
+    	search.put("checkedItems", checkedItems); // b_codes는 null일 수도 있음
     	//startRownum과 endrownum을담 아서 
     	search.put("startRowNum", startRowNum);
     	search.put("endRowNum", endRowNum);
-        totalRow = (b_codes == null || b_codes.isEmpty())
+        totalRow = ( checkedItems == null || checkedItems.isEmpty())
                 ? salesmapper.getCountDefault()
                 : salesmapper.getCount(search);
-//		if(b_codes==null) {
-//			totalRow=salesmapper.getCountDefault();
-//		}else {
-//			Map<String, Object> search = new HashMap<>();
-//			search.put("store_name", store_name);
-//			search.put("b_codes", b_codes); // List<String>
-//			totalRow=salesmapper.getCount(search);
-//		}
 		//전체 페이지의 갯수 구하기
 		int totalPageCount=(int)Math.ceil(totalRow/(double)PAGE_ROW_COUNT);
 		//끝 페이지 번호가 이미 전체 페이지 갯수보다 크게 계산되었다면 잘못된 값이다.
@@ -63,14 +55,9 @@ public class SalesSerivceImpl implements SalesService{
 			endPageNum=totalPageCount; //보정해 준다. 
 		}
 	
-		
-		  List<AdminSalesDto> salesList = salesmapper.getAdminSalesList(search); // 항상 이거 사용
-    	
-//    	   // 리스트 가져오기 (페이징 포함, 조건 없으면 전체 조회이지만 LIMIT 적용됨)
-//        List<AdminSalesDto> salesList = (b_codes == null || b_codes.isEmpty())
-//            ? salesmapper.getAdminSales()
-//            : salesmapper.getAdminSalesList(search);
+		List<AdminSalesDto> salesList = salesmapper.getAdminSalesList(search); // 항상 이거 사용
         System.out.println(search);
+ 
         // DTO에 값 설정해서 리턴
         AdminSalesDto dto = new AdminSalesDto();
         dto.setList(salesList);

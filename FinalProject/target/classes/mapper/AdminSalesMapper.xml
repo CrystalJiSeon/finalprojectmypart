@@ -3,7 +3,7 @@
 <mapper namespace="com.example.FinalProject.mapper.AdminSalesMapper">
 
 	<select id="getAdminSales" resultType="AdminSalesDto">
-	  SELECT admin_sale_id, store_name, TO_CHAR(cre_date, 'YYYY-MM-DD') AS cre_date, TO_CHAR(edit_date, 'YYYY-MM-DD') AS edit_date, sale_name, price, a_code, b_code, auto
+	  SELECT admin_sale_id, user_id, TO_CHAR(cre_date, 'YYYY-MM-DD') AS cre_date, TO_CHAR(edit_date, 'YYYY-MM-DD') AS edit_date, sale_name, price, cd_acode, cd_bcode, auto
 	  FROM tb_admin_sale
 	  ORDER BY cre_date DESC
 	</select>
@@ -12,16 +12,16 @@
 	    SELECT *
 	    FROM (select result1.*, rownum as rnum
 	    	  from
-	    	  		(select admin_sale_id, store_name, TO_CHAR(cre_date, 'YYYY-MM-DD') AS cre_date, TO_CHAR(edit_date, 'YYYY-MM-DD') AS edit_date, sale_name, price, a_code, b_code, auto
+	    	  		(select admin_sale_id, user_id, TO_CHAR(cre_date, 'YYYY-MM-DD') AS cre_date, TO_CHAR(edit_date, 'YYYY-MM-DD') AS edit_date, sale_name, price, cd_acode, cd_bcode, auto
 	    	  		 from tb_admin_sale
 		            <where>
-		                <if test="store_name != null and store_name != ''">
-		                    AND store_name LIKE '%' || #{store_name} || '%'
+		                <if test="user_id != null and user_id != ''">
+		                    AND user_id LIKE '%' || #{user_id} || '%'
 		                </if>
-		                <if test="b_codes != null and b_codes.size() > 0">
-		                    AND b_code IN
-		                    <foreach item="b_code" collection="b_codes" open="(" separator="," close=")">
-		                        #{b_code}
+		                <if test="checkedItems != null and checkedItems.size() > 0">
+		                    AND cd_bcode IN
+		                    <foreach item="cd_bcode" collection="checkedItems" open="(" separator="," close=")">
+		                        #{cd_bcode}
 		                    </foreach>
 		                </if>
 		            </where>
@@ -36,43 +36,43 @@
 		  SELECT COUNT(*)
 		    FROM tb_admin_sale 
 		    <where>
-		        <if test="store_name != null and store_name != ''">
-		            AND store_name LIKE '%' || #{store_name} || '%'
+		        <if test="user_id != null and user_id != ''">
+		            AND user_id LIKE '%' || #{user_id} || '%'
 		        </if>
-		        <if test="b_codes != null and b_codes.size() > 0">
-		            AND b_code IN
-		            <foreach item="b_code" collection="b_codes" open="(" separator="," close=")">
-		                #{b_code}
+		        <if test="checkedItems != null and checkedItems.size() > 0">
+		            AND cd_bcode IN
+		            <foreach item="cd_bcode" collection="checkedItems" open="(" separator="," close=")">
+		                #{cd_bcode}
 		            </foreach>
 		        </if>
 		    </where>
 	</select>
 	<select id="getAdminSaleById" parameterType="int" resultType="AdminSalesDto">
 		select * from tb_admin_sale
-		where adminsale_id=#{adminsale_id}
+		where admin_sale_id=#{admin_sale_id}
 	</select>
 	<insert id="insertAdminSales" parameterType="AdminSalesDto">
 		insert into tb_admin_sale
-		(adminsale_id, store_name, cre_date, edit_date, sale_name, price, a_code, b_code, auto)
+		(admin_sale_id, user_id, cre_date, edit_date, sale_name, price, cd_acode, cd_bcode, auto)
 		values 
-		(adminsale_seq.nextval, #{store_name}, sysdate, sysdate, #{sale_name}, #{price}, #{a_code}, #{b_code}, 'NO' )				
+		(seq_admin_sale_id.nextval, #{user_id}, sysdate, sysdate, #{sale_name}, #{price}, #{cd_acode}, #{cd_bcode}, 'NO' )				
 	</insert>
 	<update id="editAdminSales">
 		update tb_admin_sale
-		set (store_name=#{store_name}, edit_date=sysdate, sale_name=#{sale_name}, 
-		     price=#{price}, a_code=#{a_code}, b_code=#{b_code}, auto='NO')
-		where adminsale_id=#{adminsale_id}
+		set (user_id=#{user_id}, edit_date=sysdate, sale_name=#{sale_name}, 
+		     price=#{price}, cd_acode=#{cd_acode}, cd_bcode=#{cd_bcode}, auto='NO')
+		where admin_sale_id=#{admin_sale_id}
 	</update>
 	<delete id="deleteAdminSales">
 		delete from tb_admin_sale
-		where adminsale_id=#{adminsale_id}
+		where admin_sale_id=#{admin_sale_id}
 	</delete>
 
 	<insert id="insertOrderApprovedCost">
 		insert into tb_admin_sale
-		(adminsale_id, store_name,cre_date,edit_date, sale_name,price, a_code, b_code,auto)
+		(admin_sale_id, user_id,cre_date,edit_date, sale_name,price, cd_acode, cd_bcode,auto)
 		values 
-		(adminsale_seq.nextval,#{store_name}, sysdate, sysdate, #{sale_name}, #{price}, #{a_code}, #{b_code}, 'YES') 
+		(seq_admin_sale_id.nextval,#{user_id}, sysdate, sysdate, #{sale_name}, #{price}, #{cd_acode}, #{cd_bcode}, 'YES') 
 	</insert>
 	<select id="getApprovedOrderId" parameterType="String" resultType="int">
 	  SELECT order_id
@@ -91,9 +91,9 @@
 	</select>
 	<insert id="insertClsIngProfit">
 		insert into tb_admin_sale
-		(adminsale_id, store_name,cre_date,edit_date, sale_name,price, a_code, b_code,auto)
+		(admin_sale_id, user_id,cre_date,edit_date, sale_name,price, cd_acode, cd_bcode,auto)
 		values 
-		(adminsale_seq.nextval,#{store_name}, sysdate, sysdate, #{sale_name}, #{price}, #{a_code}, #{b_code}, 'YES') 
+		(seq_admin_sale_id.nextval,#{user_id}, sysdate, sysdate, #{sale_name}, #{price}, #{cd_acode}, #{cd_bcode}, 'YES') 
 	</insert>
 	<select id="getIngClassId" parameterType="String" resultType="SalesDto">
 	  SELECT class_id, price, status 
@@ -129,14 +129,14 @@
 	<select id="getAdminProfitStatByYear" parameterType="String" resultType="int">
 	 	select to_CHAR(cre_date,'YYYY') syear, to_char(cre_date,'YYYY-MM') smonth, user_id, sum(price)
 	 	from tb_admin_sale	 	
-	 	where user_id=#{user_id} and a_codes='PROFIT' and to_char(cre_date, 'YYYY')=#{syear}
+	 	where user_id=#{user_id} and cd_acode='PROFIT' and to_char(cre_date, 'YYYY')=#{syear}
 	 	group by user_id, to_char(cre_date, 'YYYY-MM')
 	 	order by smonth
 	</select>
 	<select id="getAdminCostStatByYear" parameterType="String" resultType="int">
 	 	select to_CHAR(cre_date,'YYYY') syear, to_char(cre_date,'YYYY-MM') smonth, user_id, sum(price)
 	 	from tb_admin_sale	 	
-	 	where user_id=#{user_id} and a_codes='COST' and to_char(cre_date, 'YYYY')=#{syear}
+	 	where user_id=#{user_id} and cd_acodes='COST' and to_char(cre_date, 'YYYY')=#{syear}
 	 	group by user_id, to_char(cre_date, 'YYYY-MM')
 	 	order by smonth
 	</select>
