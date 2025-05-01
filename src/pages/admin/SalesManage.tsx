@@ -18,6 +18,11 @@ interface PageInfo {
     totalRow: number;
   }
 function SalesManage() {
+    const [acode, setAcodeList] = useState(["수입", "지출"])
+    const A_CODE_MAP: { [key: string]: string } = {
+        "PROFIT": "수입",
+        "COST": "지출"
+    };
     const [bcode, setBcodeList] = useState([
         { class: "수입", detail: "수업료 수입" },
         { class: "수입", detail: "기타 수입" },
@@ -25,7 +30,6 @@ function SalesManage() {
         { class: "지출", detail: "발주 비용" },
         { class: "지출", detail: "기타 지출" }
       ]);
-    const [acode, setAcodeList] = useState(["수입", "지출"])
     const B_CODE_MAP: { [key: string]: string } = {
         "CLS": "수업료 수입",
         "ETC": "기타 수입",
@@ -37,14 +41,12 @@ function SalesManage() {
     const [title, setTitle] = useState("매출 추가");
     const [btnTag, setBtnTag] = useState("추가")
     const [onBtn, setOnBtn] = useState(()=>{ })
-    const [salesList, setSalesList]=useState<AdminSalesDto[]>([]);
     const [checkedItems, setCheckedItems] = useState<string[]>([]);
     const [params, setParams] = useSearchParams({
         checkedItems:checkedItems,
         store_name:"",
         pageNum:"1"
     })
-    
     useEffect(()=>{
         console.log("useEffect는 실행됨")
         //query 파라미터 값을 읽어와
@@ -52,49 +54,19 @@ function SalesManage() {
         let pageNumStr = params.get("pageNum");
         let pageNum = pageNumStr ? parseInt(pageNumStr) : 1;
         handleSearch(pageNum);
-    },[params])
+    },[params.get("pageNum")])
     const move = (page: number) => {
         setParams(prev => {
             prev.set("pageNum", page.toString());
             return prev;
         });
-    };
-    const handleAddSales = async(data:{
-        sdate:string;
-        selectedACode: string;
-        selectedBCode: string;
-        salesName:string;
-        price:number;
-    })=>{
-        try{
-            alert("매출이 추가되었습니다")
-            setModalShow(false)
-        }catch(error){
-            console.error("매출 추가 실패:", error)
-            alert("매출을 추가할 수 없습니다.")
-        }
-    }
-    const handleAdd = () => {
-        setTitle("매출 추가")
-        setBtnTag("추가")
-        setOnBtn(()=>handleAddSales)
-        setModalShow(true)
-    };
-    const handleUpdate = () => {
-        setModalShow(true)
-        console.log(modalShow)
-        setTitle("매출 수정")
-        setBtnTag("수정")
-    }; 
-    
+    };  
     const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { value, checked } = e.target;
         setCheckedItems(prev =>
             checked ? [...prev, value] : prev.filter(item => item !== value)
         );
     };
-
-
     const [pageInfo, setPageInfo] = useState<PageInfo>({
         list: [],
         pageNum: 1,
@@ -123,7 +95,7 @@ function SalesManage() {
         return result;
     }
     const [pageArray, setPageArray]=useState<number[]>([]);
-    const handleSearch=(pageNum :number)=>{
+    const handleSearch=()=>{
         const query=listToQuery(checkedItems, "checkedItems");
         console.log(query);
         api.get(`/sales?${query}`,{
@@ -137,7 +109,8 @@ function SalesManage() {
             setPageInfo(res.data);
             const mappedData = (res.data.list as AdminSalesDto[]).map(item => ({
                 ...item,
-                b_code: B_CODE_MAP[item.b_code] || item.b_code // 못찾으면 원래 값
+                a_code: A_CODE_MAP[item.a_code] || item.a_code,  // a_code 매핑 || 못찾으면 원래값
+                b_code: B_CODE_MAP[item.b_code] || item.b_code // b_code 매핑 || 못찾으면 원래값
             }));
             setPageInfo({
                 ...res.data,
@@ -148,6 +121,34 @@ function SalesManage() {
         })
         .catch(error=>console.log(error+"리스트를 불러오는데 오류가 생겼습니다"));
     }
+    const handleAddSales = async(data:{
+        sdate:string;
+        selectedACode: string;
+        selectedBCode: string;
+        salesName:string;
+        price:number;
+    })=>{
+        try{
+            alert("매출이 추가되었습니다")
+            setModalShow(false)
+        }catch(error){
+            console.error("매출 추가 실패:", error)
+            alert("매출을 추가할 수 없습니다.")
+        }
+    }
+    const handleAdd = () => {
+        setTitle("매출 추가")
+        setBtnTag("추가")
+        setOnBtn(()=>handleAddSales)
+        setModalShow(true)
+    };
+    const handleUpdate = () => {
+        setModalShow(true)
+        console.log(modalShow)
+        setTitle("매출 수정")
+        setBtnTag("수정")
+    }; 
+ 
     return (
         <Layout currentMenu="salesmanage">
             <AdminSalesModal show={modalShow} title={title} btnTag={btnTag} onBtn={onBtn} 
