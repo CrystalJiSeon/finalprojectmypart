@@ -38,34 +38,39 @@ public class SalesSerivceImpl implements SalesService{
 		int endPageNum=startPageNum+PAGE_DISPLAY_COUNT-1;
 		//전체 글의 갯수
 		int totalRow;
-		if(b_codes==null) {
-			totalRow=salesmapper.getCountDefault();
-		}else {
-			Map<String, Object> search = new HashMap<>();
-			search.put("store_name", store_name);
-			search.put("b_codes", b_codes); // List<String>
-			totalRow=salesmapper.getCount(search);
-		}
+		// 검색 조건 및 페이징 정보를 Map에 담음
+    	Map<String, Object> search = new HashMap<>();
+    	search.put("store_name", store_name);
+    	search.put("b_codes", b_codes); // b_codes는 null일 수도 있음
+    	//startRownum과 endrownum을담 아서 
+    	search.put("startRowNum", startRowNum);
+    	search.put("endRowNum", endRowNum);
+        totalRow = (b_codes == null || b_codes.isEmpty())
+                ? salesmapper.getCountDefault()
+                : salesmapper.getCount(search);
+//		if(b_codes==null) {
+//			totalRow=salesmapper.getCountDefault();
+//		}else {
+//			Map<String, Object> search = new HashMap<>();
+//			search.put("store_name", store_name);
+//			search.put("b_codes", b_codes); // List<String>
+//			totalRow=salesmapper.getCount(search);
+//		}
 		//전체 페이지의 갯수 구하기
 		int totalPageCount=(int)Math.ceil(totalRow/(double)PAGE_ROW_COUNT);
 		//끝 페이지 번호가 이미 전체 페이지 갯수보다 크게 계산되었다면 잘못된 값이다.
 		if(endPageNum > totalPageCount){
 			endPageNum=totalPageCount; //보정해 준다. 
 		}
-		//startRownum과 endrownum을 PostDto 객체에 담아서 
+	
 		
-
-    	// 검색 조건 및 페이징 정보를 Map에 담음
-    	Map<String, Object> search = new HashMap<>();
-    	search.put("store_name", store_name);
-    	search.put("b_codes", b_codes); // b_codes는 null일 수도 있음
-    	search.put("startRowNum", startRowNum);
-    	search.put("endRowNum", endRowNum);
-    	   // 리스트 가져오기 (페이징 포함, 조건 없으면 전체 조회이지만 LIMIT 적용됨)
-        List<AdminSalesDto> salesList = (b_codes == null || b_codes.isEmpty())
-            ? salesmapper.getAdminSales()
-            : salesmapper.getAdminSalesList(search);
-
+		  List<AdminSalesDto> salesList = salesmapper.getAdminSalesList(search); // 항상 이거 사용
+    	
+//    	   // 리스트 가져오기 (페이징 포함, 조건 없으면 전체 조회이지만 LIMIT 적용됨)
+//        List<AdminSalesDto> salesList = (b_codes == null || b_codes.isEmpty())
+//            ? salesmapper.getAdminSales()
+//            : salesmapper.getAdminSalesList(search);
+        System.out.println(search);
         // DTO에 값 설정해서 리턴
         AdminSalesDto dto = new AdminSalesDto();
         dto.setList(salesList);
@@ -76,7 +81,9 @@ public class SalesSerivceImpl implements SalesService{
         dto.setTotalRow(totalRow);
         dto.setStartRowNum(startRowNum);
         dto.setEndRowNum(endRowNum);
-
+        
+        System.out.println(dto);
+        
         return dto;
 
 	}
