@@ -1,12 +1,12 @@
 export interface AdminSalesDto {
-    adminsale_id: number;
-    store_name: string;
-    sale_name: string;
-    cre_date: string;
-    edit_date: string;
+    adminSaleId: number;
+    storeName: string;
+    saleName: string;
+    creDate: string;
+    editDate: string;
     price: number;
-    a_code: string;
-    b_code: string;
+    cdAcode: string;
+    cdBcode: string;
     checkedItems: string[];
     auto: string;
     startRowNum: number;

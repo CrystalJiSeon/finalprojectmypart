@@ -44,7 +44,7 @@ function SalesManage() {
     const [checkedItems, setCheckedItems] = useState<string[]>([]);
     const [params, setParams] = useSearchParams({
         checkedItems:checkedItems,
-        store_name:"",
+        userId:"",
         pageNum:"1"
     })
     useEffect(()=>{
@@ -53,7 +53,7 @@ function SalesManage() {
         //만일 존재 하지 않는다면 1 페이지로 설정
         let pageNumStr = params.get("pageNum");
         let pageNum = pageNumStr ? parseInt(pageNumStr) : 1;
-        handleSearch(pageNum);
+        handleSearch();
     },[params.get("pageNum")])
     const move = (page: number) => {
         setParams(prev => {
@@ -100,7 +100,7 @@ function SalesManage() {
         console.log(query);
         api.get(`/sales?${query}`,{
             params:{
-                store_name:params.get("store_name"),
+                userId:params.get("UserId"),
                 pageNum:params.get("pageNum")
             }
         })
@@ -109,8 +109,8 @@ function SalesManage() {
             setPageInfo(res.data);
             const mappedData = (res.data.list as AdminSalesDto[]).map(item => ({
                 ...item,
-                a_code: A_CODE_MAP[item.a_code] || item.a_code,  // a_code 매핑 || 못찾으면 원래값
-                b_code: B_CODE_MAP[item.b_code] || item.b_code // b_code 매핑 || 못찾으면 원래값
+                cdAcode: A_CODE_MAP[item.cdAcode] || item.cdAcode,  // a_code 매핑 || 못찾으면 원래값
+                cdBcode: B_CODE_MAP[item.cdBcode] || item.cdBcode // b_code 매핑 || 못찾으면 원래값
             }));
             setPageInfo({
                 ...res.data,
@@ -164,7 +164,7 @@ function SalesManage() {
                             <Form.Check inline label="강사 월급" value="SALARY" type="checkbox" id="SALARY" onChange={handleCheckboxChange}/>
                             <Form.Check inline label="발주 비용" value="ITEM" type="checkbox" id="ITEM" onChange={handleCheckboxChange}/>
                             <Form.Check inline label="기타 지출" value="C_ETC" type="checkbox" id="C_ETC" onChange={handleCheckboxChange}/>
-                            <Button className='btn btn-secondary' size="sm" style={{ width: "50px" }} onClick={handleSearch}>검색</Button>
+                            <Button className='btn btn-secondary' size="sm" style={{ width: "50px" }} onClick={()=>{handleSearch; move(1)}}>검색</Button>
                         </Form>
                     </div>
                     <div className='col-md-4 col-12 d-flex justify-content-end mt-3 mt-md-0'>
@@ -188,12 +188,12 @@ function SalesManage() {
                         <tbody>
                             {pageInfo.list.map((item,index)=>(
                                 <tr className="table-hover" key={index}>
-                                    <td>{item.cre_date}</td>
-                                    <td>{item.edit_date}</td>
-                                    <td>{item.sale_name}</td>
+                                    <td>{item.creDate}</td>
+                                    <td>{item.editDate}</td>
+                                    <td>{item.saleName}</td>
                                     <td>{item.price}</td>
-                                    <td>{item.a_code}</td>
-                                    <td>{item.b_code}</td>
+                                    <td>{item.cdAcode}</td>
+                                    <td>{item.cdBcode}</td>
                                     <td>
                                         <button onClick={handleUpdate} className="btn btn-sm btn-outline-primary">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">
