@@ -76,11 +76,71 @@ public class SalesSerivceImpl implements SalesService{
 	}
 
 
+	@Override
+	public int addAdminSale(AdminSalesDto dto) {
+		salesmapper.insertAdminSales(dto);
+		return 0;
+	}
 
 
-	
-//	@Override
-//	public void insertRevenueByClass(int classid, String storename, String acode, String bcode) {
+	@Override
+	public int editAdminSale(int adminSaleId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+
+	@Override
+	public int deleteAdminSale(int adminSaleId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+
+	@Override
+	public List<String> getSYears(String syear) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public List<String> getSMonths(String syear) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public AdminSalesDto getAdminProfitStatByYear() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public AdminSalesDto getAdminCostStatByYear() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public AdminSalesDto getAdminSalesStatByLectYearly() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public AdminSalesDto getAdminSalesStatByLectMonthly() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public void insertRevenueByClass(int classid, String storename, String acode, String bcode) {
 //		int studentCount = studentClassMapper.countByClassId(classid);
 //	    int classPrice = classMapper.getPriceByClassId(classid);
 //	    String classname = classMapper.getNameByClassId(classid);
@@ -97,6 +157,21 @@ public class SalesSerivceImpl implements SalesService{
 //
 //	    salesmapper.insertOrderApprovedCost(dto);
 //		
-//	}
+	}
+
+	@Override
+	public void insertOrderApprovedCost(AdminSalesDto dto) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+
+
+
+
+	
+
 
 }

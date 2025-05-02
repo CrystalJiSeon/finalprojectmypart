@@ -19,14 +19,30 @@ public interface AdminSalesMapper {
 	int getCountDefault();
 	int getCount(Map<String, Object> search);
 	AdminSalesDto getAdminSaleById(int adminsaleid);
-	int insertAdminSales(SalesDto dto);
-	int editAdminSales(SalesDto dto);
+	int insertAdminSales(AdminSalesDto dto);
+	int editAdminSales(AdminSalesDto dto);
 	int deleteAdminSales(int adminsaleid);//
+	
+	//통계 관련
+	//연도 불러오기
+	String getSYear();
+	//월 불러오기
+	String getSMonth();
+	//연도별 수입 데이터 불러오기
+	List<AdminSalesDto> getAdminProfitStatByYear();
+	//연도별 지출 데이터 불러오기
+	List<AdminSalesDto> getAdminCostStatByYear();
+	//연도별 과목별 데이터 불러오기
+	List<AdminSalesDto> getAdminSalesStatByLectYearly();
+	//연도의 월별 과목별 데이터 불러오기
+	List<AdminSalesDto> getAdminSalesStatByLectMonthly();
+	
 	//발주가 "승인"일 때 발주 비용 추가하는 메소드와 관련 메소드(발주에서 사용)
-	int insertOrderApprovedCost(SalesDto dto);
+	int insertOrderApprovedCost(AdminSalesDto dto);
 	AdminSalesDto getApprovedOrderId(String status);
 	List<AdminSalesDto> getOrderDetailByOrderId(@Param("order_id") int order_id);
-	AdminSalesDto getNameByProductId(@Param("order_id") int order_id);
+	AdminSalesDto sgetNameByProductId(@Param("order_id") int order_id);
+	
 	//수업이 '진행중'일 때 수업료 수입을 추가하는 메소드와 관련 메소드(수업에서 사용)
 	int insertClsIngProfit(AdminSalesDto dto);
 	AdminSalesDto getIngClassId(String status);
@@ -35,20 +51,6 @@ public interface AdminSalesMapper {
 //	SalesDto getPriceByClassId(@Param("classid") int classid);
 	AdminSalesDto getNameByClassId(@Param("class_id") int class_id);
 	
-	//통계 관련
-	//연도 불러오기
-	String getSYear();
-	//월 불러오기
-	String getSMonth();
-	//연도별 수입 데이터 불러오기
-	List<SalesDto> getAdminProfitStatByYear();
-	//연도별 지출 데이터 불러오기
-	List<SalesDto> getAdminCostStatByYear();
-	//연도별 과목별 데이터 불러오기
-	List<SalesDto> getAdminSalesStatByLectYearly();
-	//연도의 월별 과목별 데이터 불러오기
-	List<SalesDto> getAdminSalesStatByLectMonthly();
 	
-	//Ceo측
 	
 }

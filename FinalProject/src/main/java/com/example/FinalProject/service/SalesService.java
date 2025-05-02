@@ -11,6 +11,19 @@ public interface SalesService {
 	public int addAdminSale(AdminSalesDto dto);
 	public int editAdminSale(int adminSaleId);
 	public int deleteAdminSale(int adminSaleId);
-	//	public void insertRevenueByClass(int classid, String storename, String acode, String bcode); 
-
+	
+	//통계 관련
+	public List<String> getSYears(String syear);
+	public List<String> getSMonths(String syear);
+	public AdminSalesDto getAdminProfitStatByYear();
+	public AdminSalesDto getAdminCostStatByYear();
+	public AdminSalesDto getAdminSalesStatByLectYearly();
+	public AdminSalesDto getAdminSalesStatByLectMonthly();
+	
+	//수업에서 실행할 메소드
+	public void insertRevenueByClass(int classid, String storename, String acode, String bcode); 
+	//발주에서 실행할 메소드
+	public void insertOrderApprovedCost(AdminSalesDto dto);
+	
+	
 }
