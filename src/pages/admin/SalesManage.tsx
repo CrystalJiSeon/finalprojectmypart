@@ -48,7 +48,9 @@ function SalesManage() {
     const [title, setTitle] = useState("매출 추가");
     const [btnTag, setBtnTag] = useState("추가")
     const [onBtn, setOnBtn] = useState(()=>{ })
+    //매출 수정/삭제 시 saleId읽어오기 위해 관리되는 값
     const [selectedItem, setSelectedItem]=useState<AdminSalesDto|null>(null)
+    //검색조건 체크박스 관리값값
     const [checkedItems, setCheckedItems] = useState<string[]>([]);
     const [params, setParams] = useSearchParams({
         checkedItems:checkedItems,
@@ -141,7 +143,6 @@ function SalesManage() {
         saleName:string;
         price:number;
     })=>{
-        
         const requestBody = {
             cdAcode:data.selectedAcode ==="수입"? "PROFIT":"COST",
             cdBcode: REVERSE_B_CODE_MAP[data.selectedBcode]||data.selectedBcode,
@@ -150,29 +151,77 @@ function SalesManage() {
             userId:1
         }
         console.log(requestBody)
-       
+        console.log("Modal 상태", modalShow, "Selected Item", selectedItem);
+
         api.post("/sales", requestBody)
         .then(res=>{
             console.log(res.data);
             alert("매출이 추가되었습니다")
             setModalShow(false)
+            console.log("Modal 상태", modalShow, "Selected Item", selectedItem);
+
         })
         .catch(error=>{
             console.error("매출 추가 실패:", error)
             alert("매출을 추가할 수 없습니다.")
-        })
+            console.log("Modal 상태", modalShow, "Selected Item", selectedItem);
 
-       
-       
+        })      
     }
     const handleUpdate = (id:number) => {   
-
+        const item = pageInfo.list.find(item => item.adminSaleId === id);
+        if (!item) return;
+        setTitle("매출 수정");
+        setBtnTag("수정");
+        setSelectedItem(item); // 모달에 넘길 초기값
+        setOnBtn(() => handleUpdateSales); // 수정 함수 바인딩
+        setModalShow(true);
+        console.log(item)
     }; 
-    const handleUpdateSales=()=>{
-
-    }
+    const handleUpdateSales=async (data: {
+        selectedAcode: string;
+        selectedBcode: string;
+        saleName: string;
+        price: number;
+    }) => {
+        if (!selectedItem) return;
+        const requestBody = {
+            // AdminSaleId: selectedItem.adminSaleId,
+            cdAcode: data.selectedAcode === "수입" ? "PROFIT" : "COST",
+            cdBcode: REVERSE_B_CODE_MAP[data.selectedBcode] || data.selectedBcode,
+            saleName: data.saleName,
+            price: data.price,
+            userId: 1 // 수정 필요 시 이 값도 동적으로, 일단 하드코딩
+        };
+        const adminSaleId= selectedItem.adminSaleId
+        console.log(requestBody)
+        api.patch(`/sales/${adminSaleId}`, requestBody)
+        .then(res=>{
+            console.log(res.data)
+            alert("매출이 수정되었습니다");
+            setModalShow(false);
+            handleSearch(); // 수정 후 리스트 갱신
+        })
+        .catch(error=>{
+            console.error("매출 수정 실패:", error);
+            alert("매출 수정에 실패했습니다.");
+        })             
+    };
     const handleDelete=(id:number)=>{
-
+        console.log("삭제버튼눌림")
+        const item = pageInfo.list.find(item => item.adminSaleId === id);
+        if (!item) return;
+        console.log(item)
+        const adminSaleId=item.adminSaleId
+        api.delete(`/sales/${adminSaleId}`)
+        .then(res=>{
+            console.log("삭제되었습니다");
+            handleSearch();
+        })
+        .catch(error=>{
+            console.error("매출 삭제 실패:",error)
+            alert("매출 삭제에 실패했습니다")
+        })
     }
     return (
         <Layout currentMenu="salesmanage">
@@ -204,8 +253,8 @@ function SalesManage() {
                                 <th>매출수정일자</th>
                                 <th>항목 내용</th>
                                 <th>금액</th>
-                                <th>구분</th>
-                                <th>구분상세</th>
+                                <th>대분류</th>
+                                <th>소분류</th>
                                 <th>수정</th>
                                 <th>삭제</th>
                             </tr>
@@ -220,7 +269,7 @@ function SalesManage() {
                                     <td>{item.cdAcode}</td>
                                     <td>{item.cdBcode}</td>
                                     <td>
-                                        <button onClick={handleUpdate(item.adminSaleId)} className="btn btn-sm btn-outline-primary">
+                                        <button onClick={()=>handleUpdate(item.adminSaleId)} className="btn btn-sm btn-outline-primary">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">
                                                 <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
                                                 <path fillRule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
@@ -228,7 +277,7 @@ function SalesManage() {
                                         </button>
                                     </td>
                                     <td>
-                                        <button onClick={handleDelete(item.adminSaleId)} className="btn btn-sm btn-outline-danger">
+                                        <button onClick={()=>handleDelete(item.adminSaleId)} className="btn btn-sm btn-outline-danger">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-trash" viewBox="0 0 16 16">
                                                 <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
                                                 <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
