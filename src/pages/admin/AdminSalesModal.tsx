@@ -6,8 +6,8 @@ import React from 'react';
 
 type Student = {id:number, name:string}
 function AdminSalesModal({show, title, btnTag, onBtn, onClose, bcode, acode, initialData}) {
-    const [selectedBCode, setSelectedBCode] = useState('');
-    const [selectedACode, setSelectedACode] = useState('');
+    const [selectedBcode, setSelectedBcode] = useState('');
+    const [selectedACode, setSelectedAcode] = useState('');
     const [price, setPrice] = useState(0);
     const [saleName, setSaleName] = useState<string>('');
 
@@ -25,8 +25,7 @@ function AdminSalesModal({show, title, btnTag, onBtn, onClose, bcode, acode, ini
                         <Form.Group className="mb-3" controlId="acode">
                             <Form.Label>구분</Form.Label>
                             <Form.Select onChange={((e)=>{
-                                    setSelectedACode(e.target.value)
-                                    setSelectedBCode('')
+                                    setSelectedAcode(e.target.value)
                             })}>
                                 <option value="">구분</option>
                                 {acode.map((item, index) => (
@@ -36,7 +35,7 @@ function AdminSalesModal({show, title, btnTag, onBtn, onClose, bcode, acode, ini
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="bcode">
                             <Form.Label>구분 상세</Form.Label>
-                            <Form.Select onChange={(e)=>{setSelectedBCode(e.target.value); }}>
+                            <Form.Select onChange={(e)=>{setSelectedBcode(e.target.value); }}>
                                 <option value="">구분 상세</option>
                                 {filteredBcode.map((item, index) => (
                                     <option key={index} value={item.detail}>{item.detail}</option>
@@ -45,7 +44,7 @@ function AdminSalesModal({show, title, btnTag, onBtn, onClose, bcode, acode, ini
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="saleName">
                             <Form.Label>항목 내용</Form.Label>
-                            <Form.Control  type="text"  placeholder="수입/지출 항목 내용을 입력하세요" autoFocus />
+                            <Form.Control  type="text"  placeholder="수입/지출 항목 내용을 입력하세요" autoFocus value={saleName} onChange={(e) => setSaleName(e.target.value)} />
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="price">
                             <Form.Label>매출 입력</Form.Label>
@@ -54,7 +53,7 @@ function AdminSalesModal({show, title, btnTag, onBtn, onClose, bcode, acode, ini
                     </Form.Group>      
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button onClick={()=>{onBtn({selectedBCode,selectedACode,saleName, price})}}>{btnTag}</Button>
+                    <Button onClick={()=>{onBtn({selectedBcode,selectedACode,saleName, price})}}>{btnTag}</Button>
                 </Modal.Footer>
             </Modal>
         </>

@@ -37,6 +37,13 @@ function SalesManage() {
         "ITEM": "발주 비용",
         "C_ETC": "기타 지출"
     };
+    const REVERSE_B_CODE_MAP: { [key: string]: string } = {
+        "수업료 수입": "CLS",
+        "기타 수입": "ETC",
+        "강사 월급": "SALARY",
+        "발주 비용": "ITEM",
+        "기타 지출": "C_ETC"
+    };
     const [modalShow, setModalShow] = useState(false);
     const [title, setTitle] = useState("매출 추가");
     const [btnTag, setBtnTag] = useState("추가")
@@ -129,18 +136,34 @@ function SalesManage() {
         setModalShow(true)
     };
     const handleAddSales = async(data:{
-        selectedACode: string;
-        selectedBCode: string;
+        selectedAcode: string;
+        selectedBcode: string;
         saleName:string;
         price:number;
     })=>{
-        try{
+        
+        const requestBody = {
+            cdAcode:data.selectedAcode ==="수입"? "PROFIT":"COST",
+            cdBcode: REVERSE_B_CODE_MAP[data.selectedBcode]||data.selectedBcode,
+            saleName:data.saleName,
+            price:data.price,
+            userId:1
+        }
+        console.log(requestBody)
+       
+        api.post("/sales", requestBody)
+        .then(res=>{
+            console.log(res.data);
             alert("매출이 추가되었습니다")
             setModalShow(false)
-        }catch(error){
+        })
+        .catch(error=>{
             console.error("매출 추가 실패:", error)
             alert("매출을 추가할 수 없습니다.")
-        }
+        })
+
+       
+       
     }
     const handleUpdate = (id:number) => {   
 
