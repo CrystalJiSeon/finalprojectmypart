@@ -6,60 +6,122 @@ import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,PieChart, Pie, Cell, ResponsiveContainer
   } from 'recharts';
 import { Button, Form } from 'react-bootstrap';
+import api from '../../api';
+import { AdminSalesStatDto } from '../../Type/AdminSalesStatDto';
 
 type MonthlyData = {
-    month: string;
-    income: number | null;
-    expense: number | null;
+    sMonth: string;
+    profit: number | null;
+    cost: number | null;
   };
 function SalesStatus(props) {
-    const [teacher, setTeacher] = useState(["강사1", "강사2","강사3"])
-    const [lecture, setLecture] = useState(["수업1", "수업2", "수업3"])
-    const [selected, setSelected] = useState("condition")
+    const [thisYear, setThisYear]=useState<string>(new Date().getFullYear().toString());
+    const [selected, setSelected] = useState("condition");
+    const [sYearList, setSYearList] = useState<AdminSalesStatDto[]>([]);
+    const [sMonthList, setSMonthList] = useState<AdminSalesStatDto[]>([]);
+    const [sYear, setSYear] = useState(thisYear);
+    const [sMonth, setSMonth] = useState("");
     const [selectedSub, setSelectedSub]=useState("");
+    const [allYearData, setAllYearData] = useState<AdminSalesStatDto[]>([]);
     const [hideSubCondition, setHideSubCondition] = useState(true);
-    const salesData: MonthlyData[] = [
-        { month: '1월', income: 1200000, expense: 800000 },
-        { month: '2월', income: 1350000, expense: 950000 },
-        { month: '3월', income: 1100000, expense: 720000 },
-        { month: '4월', income: 1500000, expense: 1000000 },
-        { month: '5월', income: null, expense: null },
-        { month: '6월', income: null, expense: null },
-        { month: '7월', income: null, expense: null },
-        { month: '8월', income: null, expense: null },
-        { month: '9월', income: null, expense: null },
-        { month: '10월', income: null, expense: null },
-        { month: '11월', income: null, expense: null },
-        { month: '12월', income: null, expense: null },
-      ];
-      
+    const [salesData, setSalesData]= useState<MonthlyData[]>([]);
+
+    useEffect(() => {
+        if (selected === "salesByYear") {
+            fetchYearlySales();
+            console.log("AllYearData", allYearData)
+        }else if (selected === "salesByLecture") {
+            fetchLectureSales();
+        } else {
+            setSYearList([]);
+        }
+    }, [selected]);
+   // useEffect에서 allYearData가 변경될 때 salesData를 업데이트
+useEffect(() => {
+    if (selected === "salesByYear" && allYearData.length > 0) {
+        const selectedYearData = allYearData.find(item => item.syear === sYear);
+        console.log("selectedYearData", selectedYearData)
+        if (selectedYearData?.profitList || selectedYearData?.costList) {
+            const profitMap = new Map<string, number>();
+            const costMap = new Map<string, number>();
+
+            // profitList, costList에서 월별 데이터를 매핑
+            selectedYearData.profitList?.forEach(item => {
+                if (item.smonth && item.price !== undefined) {
+                    profitMap.set(item.smonth, item.price);
+                }
+            });
+
+            selectedYearData.costList?.forEach(item => {
+                if (item.smonth && item.price !== undefined) {
+                    costMap.set(item.smonth, item.price);
+                }
+            });
+            console.log(profitMap, "profitMap")
+            console.log(costMap, "costMap")
+            // 모든 월을 합친 유니크한 Set
+            const allMonths = Array.from(new Set([...profitMap.keys(), ...costMap.keys()]));
+
+            // 월별로 profit, cost를 병합하여 포맷
+            const formatted = allMonths.map(month => ({
+                sMonth: month,
+                profit: profitMap.get(month) || 0,
+                cost: costMap.get(month) || 0,
+            })).sort((a, b) => Number(a.sMonth) - Number(b.sMonth)); // 월 정렬
+            console.log(formatted, "formatted")
+            setSalesData(formatted);
+        } else {
+            setSalesData([]); // 데이터 없으면 빈 배열
+        }
+        console.log(sYearList, "sYearList")
+        console.log("sYear", sYear)
+        console.log("AllYearData", allYearData)
+    }
+}, [allYearData, selected, sYear]);
+    const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelected(e.target.value)
+        console.log(selected)
+        if (e.target.value === "condition") {
+            setHideSubCondition(true);  // "과목별"을 선택한 경우 서브 조건 보이기
+        } else {
+            setHideSubCondition(false);  // "연도별"을 선택한 경우 서브 조건 숨기기
+        }
+    };
+    const fetchYearlySales =() => {
+        api.get(`/sales/YearlySale/${sYear}`)
+        .then((res) => {
+            const allyearlist= res.data.syearList;
+            setAllYearData(allyearlist);
+            const yearKeys = allyearlist.map(item => item.syear);
+            setSYearList(yearKeys);
+        })
+        .catch((error) => {
+            console.error("연도별 매출 데이터를 불러오는 중 오류 발생:", error);
+        });    
+    };
+    const fetchLectureSales =() => {
+        api.get(`/sales/LectureSale/${sYear}`)
+
+    }
+    const whenYearChange = (e)=> {
+        setSYear(e.target.value);
+    }
+    
+
     const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042'];
-    const yearlySales = [
+    const yearlySalesByLecture = [
     { subject: '자바', sales: 1200000 },
     { subject: '파이썬', sales: 900000 },
     { subject: 'DB', sales: 750000 },
     { subject: 'AI', sales: 500000 },
     ];
-    const monthlySales = [
+    const monthlySalesByLecture = [
         { subject: '자바', sales: 15000000 },
         { subject: '파이썬', sales: 12000000 },
         { subject: 'DB', sales: 8000000 },
         { subject: 'AI', sales: 6000000 },
-      ];
-
-    const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelected(e.target.value)
-        console.log(selected)
-        if (e.target.value === "condition") {
-            setHideSubCondition(true);  // "학생이름"을 선택한 경우 서브 조건 보이기
-        } else {
-            setHideSubCondition(false);  // 다른 조건을 선택한 경우 서브 조건 숨기기
-        }
-    };
-
-    useEffect(() => {
-        console.log("선택된 값: ", selected, selectedSub);
-    }, [selected, selectedSub]);  // selected 값이 변경될 때마다 이 코드가 실행됩니다.
+    ];
+  
 
     return (
         <Layout currentMenu="salesstat">
@@ -73,9 +135,11 @@ function SalesStatus(props) {
                                 <option value="salesByYear">연별 매출</option>
                                 <option value="salesByLecture">과목별 매출</option>
                             </Form.Select>
-                            <Form.Select hidden={hideSubCondition} size="sm" aria-label="year" className='me-2' style={{ minWidth: "250px", maxWidth:"300px" }}>
-                                <option value="condition">연도 선택</option>
-
+                            <Form.Select hidden={hideSubCondition} size="sm" aria-label="year" className='me-2' style={{ minWidth: "250px", maxWidth:"300px" }}  value={sYear} onChange={(e)=> {whenYearChange(e)}}>
+                                <option value="selectyearcondition">연도 선택</option>
+                                {sYearList.map((item, index) => (
+                                    <option key={index}>{item}</option>
+                                ))}
                             </Form.Select>
                             <Button className='btn btn-secondary' size="sm" style={{ width: "120px" }}>검색</Button>
                         </Form>
@@ -87,12 +151,22 @@ function SalesStatus(props) {
                         <ResponsiveContainer width={1000} height={400}>
                             <LineChart data={salesData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="month" />
-                                <YAxis />
-                                <Tooltip />
-                                <Legend />
-                                <Line type="monotone" dataKey="income" stroke="#82ca9d" connectNulls={false} />
-                                <Line type="monotone" dataKey="expense" stroke="#8884d8" connectNulls={false} />
+                                <XAxis dataKey="sMonth" />
+                                <Tooltip formatter={(value) => {
+                                    if (typeof value === 'number') return `${value.toLocaleString()}원`;
+                                    return value;
+                                }} />
+                                <YAxis tickFormatter={(value) => {
+                                    if (typeof value === 'number') return `${value.toLocaleString()}`;
+                                    return value;
+                                }} />
+                                <Legend formatter={(value) => {
+                                            if (value === 'profit') return '수입'; // profit에 대해 한글로 변경
+                                            if (value === 'cost') return '지출';  // cost에 대해 한글로 변경
+                                            return value;
+                                }} />
+                                <Line type="monotone" dataKey="profit" stroke="#1E90FF" connectNulls={false} />
+                                <Line type="monotone" dataKey="cost" stroke="#FF6347" connectNulls={false} />
                             </LineChart>
                         </ResponsiveContainer>
                         :
@@ -109,7 +183,7 @@ function SalesStatus(props) {
                                 <ResponsiveContainer width={500} height={400}>
                                     <PieChart>
                                     <Pie
-                                        data={yearlySales}
+                                        data={yearlySalesByLecture}
                                         dataKey="sales"
                                         nameKey="subject"
                                         cx="50%"
@@ -118,7 +192,7 @@ function SalesStatus(props) {
                                         fill="#8884d8"
                                         label
                                     >
-                                        {yearlySales.map((entry, index) => (
+                                        {yearlySalesByLecture.map((entry, index) => (
                                         <Cell key={`cell-yearly-${index}`} fill={COLORS[index % COLORS.length]} />
                                         ))}
                                     </Pie>
@@ -145,14 +219,14 @@ function SalesStatus(props) {
                                 </div>
                                 <ResponsiveContainer width={500} height={400}>
                                     <PieChart>
-                                    <Pie data={monthlySales} dataKey="sales" nameKey="subject" 
+                                    <Pie data={monthlySalesByLecture} dataKey="sales" nameKey="subject" 
                                         cx="50%"
                                         cy="50%"
                                         outerRadius={100}
                                         fill="#8884d8"
                                         label
                                     >
-                                        {monthlySales.map((entry, index) => (
+                                        {monthlySalesByLecture.map((entry, index) => (
                                         <Cell key={`cell-monthly-${index}`} fill={COLORS[index % COLORS.length]} />
                                         ))}
                                     </Pie>
