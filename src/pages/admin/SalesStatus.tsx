@@ -14,75 +14,92 @@ type MonthlyData = {
     profit: number | null;
     cost: number | null;
   };
+type LectureSalesData = {
+    subject: string|null;
+    sales: number|0;
+};
+
 function SalesStatus(props) {
     const [thisYear, setThisYear]=useState<string>(new Date().getFullYear().toString());
-    const [selected, setSelected] = useState("condition");
-    const [sYearList, setSYearList] = useState<AdminSalesStatDto[]>([]);
+    const [selected, setSelected] = useState("SalesByYear"); // 초기값 설정
+    const [sYearList, setSYearList] = useState<string[]>([]);
     const [sMonthList, setSMonthList] = useState<AdminSalesStatDto[]>([]);
     const [sYear, setSYear] = useState(thisYear);
     const [sMonth, setSMonth] = useState("");
     const [selectedSub, setSelectedSub]=useState("");
+    const [availableMonths, setAvailableMonths] = useState<string[]>([]); // 월 드롭다운용
     const [allYearData, setAllYearData] = useState<AdminSalesStatDto[]>([]);
     const [hideSubCondition, setHideSubCondition] = useState(true);
     const [salesData, setSalesData]= useState<MonthlyData[]>([]);
-
+    const whenYearChange = (e)=> {
+        setSYear(e.target.value);
+    }
+    const whenMonthChange = (e)=> {
+        setSMonth(e.target.value);
+    }
     useEffect(() => {
-        if (selected === "salesByYear") {
-            fetchYearlySales();
-            console.log("AllYearData", allYearData)
-        }else if (selected === "salesByLecture") {
+        // 컴포넌트가 마운트될 때 연도별 매출 데이터 가져오기 
+        fetchYearlySales();
+    },[])
+    useEffect(() => {
+        if (selected === "salesByLecture") {
+            setSMonth(""); // 월 초기화
+            setMonthlySalesByLecture([]);
+            setYearlySalesByLecture([]);
             fetchLectureSales();
-        } else {
-            setSYearList([]);
+        } else if (selected === "salesByYear") {
+            setSalesData([]);
+            fetchYearlySales();
         }
     }, [selected]);
    // useEffect에서 allYearData가 변경될 때 salesData를 업데이트
-useEffect(() => {
-    if (selected === "salesByYear" && allYearData.length > 0) {
-        const selectedYearData = allYearData.find(item => item.syear === sYear);
-        console.log("selectedYearData", selectedYearData)
-        if (selectedYearData?.profitList || selectedYearData?.costList) {
-            const profitMap = new Map<string, number>();
-            const costMap = new Map<string, number>();
+    useEffect(() => {
+        if (selected === "salesByYear" && allYearData.length > 0) {
+            const selectedYearData = allYearData.find(item => item.syear === sYear);
+            console.log("selectedYearData", selectedYearData)
+            if (selectedYearData?.profitList || selectedYearData?.costList) {
+                const profitMap = new Map<string, number>();
+                const costMap = new Map<string, number>();
 
-            // profitList, costList에서 월별 데이터를 매핑
-            selectedYearData.profitList?.forEach(item => {
-                if (item.smonth && item.price !== undefined) {
-                    profitMap.set(item.smonth, item.price);
-                }
-            });
+                // profitList, costList에서 월별 데이터를 매핑
+                selectedYearData.profitList?.forEach(item => {
+                    if (item.smonth && item.price !== undefined) {
+                        profitMap.set(item.smonth, item.price);
+                    }
+                });
 
-            selectedYearData.costList?.forEach(item => {
-                if (item.smonth && item.price !== undefined) {
-                    costMap.set(item.smonth, item.price);
-                }
-            });
-            console.log(profitMap, "profitMap")
-            console.log(costMap, "costMap")
-            // 모든 월을 합친 유니크한 Set
-            const allMonths = Array.from(new Set([...profitMap.keys(), ...costMap.keys()]));
+                selectedYearData.costList?.forEach(item => {
+                    if (item.smonth && item.price !== undefined) {
+                        costMap.set(item.smonth, item.price);
+                    }
+                });
+                console.log(profitMap, "profitMap")
+                console.log(costMap, "costMap")
+                // 모든 월을 합친 유니크한 Set
+                const allMonths = Array.from(new Set([...profitMap.keys(), ...costMap.keys()]));
 
-            // 월별로 profit, cost를 병합하여 포맷
-            const formatted = allMonths.map(month => ({
-                sMonth: month,
-                profit: profitMap.get(month) || 0,
-                cost: costMap.get(month) || 0,
-            })).sort((a, b) => Number(a.sMonth) - Number(b.sMonth)); // 월 정렬
-            console.log(formatted, "formatted")
-            setSalesData(formatted);
-        } else {
-            setSalesData([]); // 데이터 없으면 빈 배열
+                // 월별로 profit, cost를 병합하여 포맷
+                const formatted = allMonths.map(month => ({
+                    sMonth: month,
+                    profit: profitMap.get(month) || 0,
+                    cost: costMap.get(month) || 0,
+                })).sort((a, b) => Number(a.sMonth) - Number(b.sMonth)); // 월 정렬
+                console.log(formatted, "formatted")
+                setSalesData(formatted);
+            } else {
+                setSalesData([]); // 데이터 없으면 빈 배열
+            }
+            console.log(sYearList, "sYearList")
+            console.log("sYear", sYear)
+            console.log("AllYearData", allYearData)
         }
-        console.log(sYearList, "sYearList")
-        console.log("sYear", sYear)
-        console.log("AllYearData", allYearData)
-    }
-}, [allYearData, selected, sYear]);
+    }, [allYearData, selected, sYear]);
+
     const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setSelected(e.target.value)
         console.log(selected)
         if (e.target.value === "condition") {
-            setHideSubCondition(true);  // "과목별"을 선택한 경우 서브 조건 보이기
+            setHideSubCondition(true);  // 선택한 경우 서브 조건 보이기
         } else {
             setHideSubCondition(false);  // "연도별"을 선택한 경우 서브 조건 숨기기
         }
@@ -99,30 +116,107 @@ useEffect(() => {
             console.error("연도별 매출 데이터를 불러오는 중 오류 발생:", error);
         });    
     };
-    const fetchLectureSales =() => {
-        api.get(`/sales/LectureSale/${sYear}`)
 
-    }
-    const whenYearChange = (e)=> {
-        setSYear(e.target.value);
-    }
     
-
     const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042'];
-    const yearlySalesByLecture = [
-    { subject: '자바', sales: 1200000 },
-    { subject: '파이썬', sales: 900000 },
-    { subject: 'DB', sales: 750000 },
-    { subject: 'AI', sales: 500000 },
-    ];
-    const monthlySalesByLecture = [
-        { subject: '자바', sales: 15000000 },
-        { subject: '파이썬', sales: 12000000 },
-        { subject: 'DB', sales: 8000000 },
-        { subject: 'AI', sales: 6000000 },
-    ];
-  
 
+    const [yearlySalesByLecture, setYearlySalesByLecture] = useState<LectureSalesData[]>([]);
+    const [monthlySalesByLecture, setMonthlySalesByLecture] = useState<LectureSalesData[]>([]);
+    
+    const fetchLectureSales =() => {
+        console.log(sYear, "sYear")
+        api.get(`/sales/LectureSale/${sYear}`)
+        .then((res) => {    
+            const yearData: AdminSalesStatDto[] = res.data.syearList || [];
+            //연도 목록 드롭다운용
+            const yearKeys = yearData.map(item => item.syear);
+            setSYearList(yearKeys);  // 
+            const foundYear = yearData.find(item => item.syear === sYear);
+            if (!foundYear) {
+                setYearlySalesByLecture([]);
+                setMonthlySalesByLecture([]);
+                setAvailableMonths([]);
+                return;
+            }
+            // 연간 강의 매출
+            const yearlySales = (foundYear.lectSaleYearly || []).map(item => ({
+                subject: item.lectureName,
+                sales: item.total || 0,
+            }));
+            setYearlySalesByLecture(yearlySales);
+            // ⬇️ 월 목록 드롭다운용
+            const monthKeys = (foundYear.smonthList || []).map(month => month.smonth);
+            setAvailableMonths(monthKeys);
+            // ⬇️ 기본 선택 월
+            const firstMonth = foundYear.smonthList?.[0];
+            if (firstMonth) {
+                setSMonth(firstMonth.smonth); // 현재 선택된 월 설정
+                const monthlySales = (firstMonth.lectSaleMonthly || []).map(item => ({
+                    subject: item.bcode||null,
+                    sales: item.total || 0,
+                }));
+                setMonthlySalesByLecture(monthlySales);
+            } else {
+                setMonthlySalesByLecture([]);
+            }
+           
+        })
+        .catch((error) => { 
+            console.error("과목별 매출 데이터를 불러오는 중 오류 발생:", error);
+        });  
+
+    }
+    const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSMonth(e.target.value);  // 선택만 저장
+        api.get(`/sales/LectureSale/${sYear}`)
+        .then((res) => {
+            const yearData: AdminSalesStatDto[] = res.data.syearList || [];
+            const foundYear = yearData.find(item => item.syear === sYear);
+            const foundMonth = foundYear?.smonthList?.find(m => m.smonth === sMonth);
+            if (foundMonth) {
+                const monthlySales = (foundMonth.lectSaleMonthly || []).map(item => ({
+                    subject: item.lectureName ?? "알 수 없음",
+                    sales: item.total || 0,
+                }));
+                setMonthlySalesByLecture(monthlySales);
+            } else {
+                setMonthlySalesByLecture([]);
+            }
+        })
+        .catch(error => {
+            console.error("월별 매출 불러오기 실패:", error);
+        });
+    };
+    const handleMonthlySearchClick = () => {
+
+    };
+    // 1. sYear가 바뀔 때 강의별 연매출/월매출 데이터 불러오기
+    useEffect(() => {
+        if (selected === "salesByLecture") {
+            fetchLectureSales();
+        }
+    }, [sYear, selected]);
+
+    // 2. sMonth가 바뀔 때 해당 월의 강의 매출 조회
+    useEffect(() => {
+        if (selected === "salesByLecture" && sMonth) {
+            handleMonthlySearchClick();
+        }
+    }, [sMonth, selected]);
+    //연도변경시 초기화
+    useEffect(() => {
+        if (selected === "salesByLecture") {
+            setMonthlySalesByLecture([]);
+            setAvailableMonths([]);
+            setSMonth("");
+        }
+    }, [sYear]);
+    //월변경시 월별데이터 초기화
+    useEffect(() => {
+        if (selected === "salesByLecture" && !sMonth) {
+            setMonthlySalesByLecture([]);
+        }
+    }, [sMonth]);
     return (
         <Layout currentMenu="salesstat">
             <div>
@@ -208,8 +302,11 @@ useEffect(() => {
                                             <h5 className="mb-0">해당 연도의 월매출</h5>
                                         </div>
                                         <div className="d-flex align-items-center">
-                                            <Form.Select hidden={hideSubCondition} size="sm" aria-label="year" style={{ minWidth: '150px' }}>
+                                            <Form.Select hidden={hideSubCondition} size="sm" aria-label="year" style={{ minWidth: '150px' }} value={sMonth} onChange={handleMonthChange}>
                                                 <option value="condition">월 선택</option>
+                                                {availableMonths.map((month, index) => (
+                                                    <option key={index} value={month}>{month}월</option>
+                                                ))}
                                             </Form.Select>
                                         </div>
                                         <div className="d-flex align-items-center">
