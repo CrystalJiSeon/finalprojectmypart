@@ -58,7 +58,6 @@ function SalesManage() {
         pageNum:"1"
     })
     useEffect(()=>{
-        console.log("useEffect는 실행됨")
         //query 파라미터 값을 읽어와
         //만일 존재 하지 않는다면 1 페이지로 설정
         // let pageNumStr = params.get("pageNum");
@@ -107,7 +106,6 @@ function SalesManage() {
     const [pageArray, setPageArray]=useState<number[]>([]);
     const handleSearch=()=>{
         const query=listToQuery(checkedItems, "checkedItems");
-        console.log(query);
         api.get(`/sales?${query}`,{
             params:{
                 userId:params.get("UserId"),
@@ -115,7 +113,6 @@ function SalesManage() {
             }
         })
         .then(res=>{
-            console.log(res.data)
             setPageInfo(res.data);
             const mappedData = (res.data.list as AdminSalesDto[]).map(item => ({
                 ...item,
@@ -127,22 +124,24 @@ function SalesManage() {
                 list: mappedData
             });
             setPageArray(range(res.data.startPageNum, res.data.endPageNum))
-            console.log(pageArray)
         })
         .catch(error=>console.log(error+"리스트를 불러오는데 오류가 생겼습니다"));
     }
     const handleAdd = () => {
+        setSelectedItem(null); // 초기화
         setTitle("매출 추가")
         setBtnTag("추가")
         setOnBtn(()=>handleAddSales)
         setModalShow(true)
+        
     };
-    const handleAddSales = async(data:{
+    const handleAddSales = (data:{
         selectedAcode: string;
         selectedBcode: string;
         saleName:string;
         price:number;
     })=>{
+        console.log("Add Sales Data:", data);
         const requestBody = {
             cdAcode:data.selectedAcode ==="수입"? "PROFIT":"COST",
             cdBcode: REVERSE_B_CODE_MAP[data.selectedBcode]||data.selectedBcode,
@@ -151,53 +150,52 @@ function SalesManage() {
             userId:1
         }
         console.log(requestBody)
-        console.log("Modal 상태", modalShow, "Selected Item", selectedItem);
-
         api.post("/sales", requestBody)
         .then(res=>{
             console.log(res.data);
             alert("매출이 추가되었습니다")
             setModalShow(false)
-            console.log("Modal 상태", modalShow, "Selected Item", selectedItem);
-
+            handleSearch(); // 추가 후 리스트 갱신
         })
         .catch(error=>{
             console.error("매출 추가 실패:", error)
             alert("매출을 추가할 수 없습니다.")
-            console.log("Modal 상태", modalShow, "Selected Item", selectedItem);
-
         })      
     }
     const handleUpdate = (id:number) => {   
         const item = pageInfo.list.find(item => item.adminSaleId === id);
-        if (!item) return;
+        if (!item){ 
+            return;
+        }
         setTitle("매출 수정");
         setBtnTag("수정");
+        setOnBtn(() => (data) => handleUpdateSales(data, item.adminSaleId)); 
         setSelectedItem(item); // 모달에 넘길 초기값
-        setOnBtn(() => handleUpdateSales); // 수정 함수 바인딩
         setModalShow(true);
-        console.log(item)
     }; 
-    const handleUpdateSales=async (data: {
-        selectedAcode: string;
-        selectedBcode: string;
-        saleName: string;
-        price: number;
-    }) => {
-        if (!selectedItem) return;
+    const handleUpdateSales=(
+        data: {
+            selectedAcode: string;
+            selectedBcode: string;
+            saleName: string;
+            price: number;
+            adminSaleId: number;
+        },
+        itemId?:number
+    ) => {
+        const adminSaleId = itemId ?? data.adminSaleId;
+        if (!adminSaleId) return;
+    
         const requestBody = {
-            // AdminSaleId: selectedItem.adminSaleId,
             cdAcode: data.selectedAcode === "수입" ? "PROFIT" : "COST",
             cdBcode: REVERSE_B_CODE_MAP[data.selectedBcode] || data.selectedBcode,
             saleName: data.saleName,
             price: data.price,
-            userId: 1 // 수정 필요 시 이 값도 동적으로, 일단 하드코딩
+            adminSaleId: adminSaleId,
+            userId: 1
         };
-        const adminSaleId= selectedItem.adminSaleId
-        console.log(requestBody)
-        api.patch(`/sales/${adminSaleId}`, requestBody)
+        api.put(`/sales/${adminSaleId}`, requestBody)
         .then(res=>{
-            console.log(res.data)
             alert("매출이 수정되었습니다");
             setModalShow(false);
             handleSearch(); // 수정 후 리스트 갱신
@@ -208,18 +206,15 @@ function SalesManage() {
         })             
     };
     const handleDelete=(id:number)=>{
-        console.log("삭제버튼눌림")
         const item = pageInfo.list.find(item => item.adminSaleId === id);
         if (!item) return;
-        console.log(item)
+        console.log("item 삭제"+item)
         const adminSaleId=item.adminSaleId
         api.delete(`/sales/${adminSaleId}`)
         .then(res=>{
-            console.log("삭제되었습니다");
             handleSearch();
         })
         .catch(error=>{
-            console.error("매출 삭제 실패:",error)
             alert("매출 삭제에 실패했습니다")
         })
     }
