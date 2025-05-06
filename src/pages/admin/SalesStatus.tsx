@@ -50,6 +50,10 @@ function SalesStatus(props) {
         } else if (selected === "salesByYear") {
             setSalesData([]);
             fetchYearlySales();
+        } else {
+            setSalesData([]); // 다른 조건 선택 시 초기화
+            setSYearList([]); // 연도 목록 초기화
+            setSMonthList([]); // 월 목록 초기화
         }
     }, [selected]);
    // useEffect에서 allYearData가 변경될 때 salesData를 업데이트
@@ -118,8 +122,13 @@ function SalesStatus(props) {
     };
 
     
-    const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042'];
-
+    // const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042'];
+    const SUBJECT_COLORS: { [key: string]: string } = {
+        JAVA: '#8884d8',        // 보라
+        JAVASCRIPT: '#82ca9d',  // 초록
+        PYTHON: '#ffc658',      // 노랑
+        '알 수 없음': '#ff8042'  // 기타 (예외 처리용)
+    };
     const [yearlySalesByLecture, setYearlySalesByLecture] = useState<LectureSalesData[]>([]);
     const [monthlySalesByLecture, setMonthlySalesByLecture] = useState<LectureSalesData[]>([]);
     
@@ -127,6 +136,7 @@ function SalesStatus(props) {
         console.log(sYear, "sYear")
         api.get(`/sales/LectureSale/${sYear}`)
         .then((res) => {    
+            console.log(res.data, "res.data")
             const yearData: AdminSalesStatDto[] = res.data.syearList || [];
             //연도 목록 드롭다운용
             const yearKeys = yearData.map(item => item.syear);
@@ -140,7 +150,7 @@ function SalesStatus(props) {
             }
             // 연간 강의 매출
             const yearlySales = (foundYear.lectSaleYearly || []).map(item => ({
-                subject: item.lectureName,
+                subject: item.cdLecture,
                 sales: item.total || 0,
             }));
             setYearlySalesByLecture(yearlySales);
@@ -152,7 +162,7 @@ function SalesStatus(props) {
             if (firstMonth) {
                 setSMonth(firstMonth.smonth); // 현재 선택된 월 설정
                 const monthlySales = (firstMonth.lectSaleMonthly || []).map(item => ({
-                    subject: item.bcode||null,
+                    subject: item.cdLecture||null,
                     sales: item.total || 0,
                 }));
                 setMonthlySalesByLecture(monthlySales);
@@ -175,7 +185,7 @@ function SalesStatus(props) {
             const foundMonth = foundYear?.smonthList?.find(m => m.smonth === sMonth);
             if (foundMonth) {
                 const monthlySales = (foundMonth.lectSaleMonthly || []).map(item => ({
-                    subject: item.lectureName ?? "알 수 없음",
+                    subject: item.cdLecture ?? "알 수 없음",
                     sales: item.total || 0,
                 }));
                 setMonthlySalesByLecture(monthlySales);
@@ -287,7 +297,10 @@ function SalesStatus(props) {
                                         label
                                     >
                                         {yearlySalesByLecture.map((entry, index) => (
-                                        <Cell key={`cell-yearly-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        <Cell
+                                            key={`cell-yearly-${index}`}
+                                            fill={SUBJECT_COLORS[entry.subject ?? '알 수 없음'] || '#ccc'}
+                                        />
                                         ))}
                                     </Pie>
                                     <Tooltip />
@@ -324,7 +337,10 @@ function SalesStatus(props) {
                                         label
                                     >
                                         {monthlySalesByLecture.map((entry, index) => (
-                                        <Cell key={`cell-monthly-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        <Cell
+                                            key={`cell-monthly-${index}`}
+                                            fill={SUBJECT_COLORS[entry.subject ?? '알 수 없음'] || '#ccc'}
+                                        />
                                         ))}
                                     </Pie>
                                     <Tooltip />
