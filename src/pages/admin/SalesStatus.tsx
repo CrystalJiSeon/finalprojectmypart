@@ -21,7 +21,7 @@ type LectureSalesData = {
 
 function SalesStatus(props) {
     const [thisYear, setThisYear]=useState<string>(new Date().getFullYear().toString());
-    const [selected, setSelected] = useState("SalesByYear"); // 초기값 설정
+    const [selected, setSelected] = useState("condition"); // 초기값 설정
     const [sYearList, setSYearList] = useState<string[]>([]);
     const [sMonthList, setSMonthList] = useState<AdminSalesStatDto[]>([]);
     const [sYear, setSYear] = useState(thisYear);
@@ -40,6 +40,8 @@ function SalesStatus(props) {
     useEffect(() => {
         // 컴포넌트가 마운트될 때 연도별 매출 데이터 가져오기 
         fetchYearlySales();
+        setSelected("salesByYear"); // 초기 선택값 설정
+        setHideSubCondition(false)
     },[])
     useEffect(() => {
         if (selected === "salesByLecture") {
@@ -93,9 +95,6 @@ function SalesStatus(props) {
             } else {
                 setSalesData([]); // 데이터 없으면 빈 배열
             }
-            console.log(sYearList, "sYearList")
-            console.log("sYear", sYear)
-            console.log("AllYearData", allYearData)
         }
     }, [allYearData, selected, sYear]);
 
@@ -103,9 +102,9 @@ function SalesStatus(props) {
         setSelected(e.target.value)
         console.log(selected)
         if (e.target.value === "condition") {
-            setHideSubCondition(true);  // 선택한 경우 서브 조건 보이기
+            setHideSubCondition(true);  // 선택한 경우 서브 조건 숨기기
         } else {
-            setHideSubCondition(false);  // "연도별"을 선택한 경우 서브 조건 숨기기
+            setHideSubCondition(false);  // "연도별"을 선택한 경우 서브 조건 보이기
         }
     };
     const fetchYearlySales =() => {
@@ -205,14 +204,14 @@ function SalesStatus(props) {
         if (selected === "salesByLecture") {
             fetchLectureSales();
         }
-    }, [sYear, selected]);
+    }, [sYear]);
 
     // 2. sMonth가 바뀔 때 해당 월의 강의 매출 조회
     useEffect(() => {
         if (selected === "salesByLecture" && sMonth) {
             handleMonthlySearchClick();
         }
-    }, [sMonth, selected]);
+    }, [sMonth]);
     //연도변경시 초기화
     useEffect(() => {
         if (selected === "salesByLecture") {
@@ -235,7 +234,6 @@ function SalesStatus(props) {
                     <div className="col-md-8 col-12 d-flex justify-content-between align-items-center">
                         <Form className='d-flex'>
                             <Form.Select value={selected} onChange={handleSelect} size="sm" aria-label="yearorlecture" className='me-2' style={{ minWidth: "250px", maxWidth:"500px" }}>
-                                <option value="condition">검색 조건</option>
                                 <option value="salesByYear">연별 매출</option>
                                 <option value="salesByLecture">과목별 매출</option>
                             </Form.Select>
@@ -252,27 +250,25 @@ function SalesStatus(props) {
                 
                     {
                         selected==="salesByYear"?
-                        <ResponsiveContainer width={1000} height={400}>
-                            <LineChart data={salesData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="sMonth" />
-                                <Tooltip formatter={(value) => {
-                                    if (typeof value === 'number') return `${value.toLocaleString()}원`;
-                                    return value;
-                                }} />
-                                <YAxis tickFormatter={(value) => {
-                                    if (typeof value === 'number') return `${value.toLocaleString()}`;
-                                    return value;
-                                }} />
-                                <Legend formatter={(value) => {
-                                            if (value === 'profit') return '수입'; // profit에 대해 한글로 변경
-                                            if (value === 'cost') return '지출';  // cost에 대해 한글로 변경
-                                            return value;
-                                }} />
-                                <Line type="monotone" dataKey="profit" stroke="#1E90FF" connectNulls={false} />
-                                <Line type="monotone" dataKey="cost" stroke="#FF6347" connectNulls={false} />
-                            </LineChart>
-                        </ResponsiveContainer>
+                        <LineChart width={1000} height={400} data={salesData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="sMonth" />
+                            <Tooltip formatter={(value) => {
+                                if (typeof value === 'number') return `${value.toLocaleString()}원`;
+                                return value;
+                            }} />
+                            <YAxis tickFormatter={(value) => {
+                                if (typeof value === 'number') return `${value.toLocaleString()}`;
+                                return value;
+                            }} />
+                            <Legend formatter={(value) => {
+                                        if (value === 'profit') return '수입'; // profit에 대해 한글로 변경
+                                        if (value === 'cost') return '지출';  // cost에 대해 한글로 변경
+                                        return value;
+                            }} />
+                            <Line type="monotone" dataKey="profit" stroke="#1E90FF" connectNulls={false} />
+                            <Line type="monotone" dataKey="cost" stroke="#FF6347" connectNulls={false} />
+                        </LineChart>
                         :
                         <div>
                         </div>
