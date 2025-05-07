@@ -81,15 +81,26 @@ function SalesStatus(props) {
                 });
                 console.log(profitMap, "profitMap")
                 console.log(costMap, "costMap")
+                //1월 ~12월 빈 값 넣어주기 + 연도-월 형식으로 값 대응시키기
+                const formatted = Array.from({ length: 12 }, (_, i) => {
+                    const monthNum = i + 1;
+                    const paddedMonth = monthNum.toString().padStart(2, '0'); // '01' ~ '12'
+                    const key = `${sYear}-${paddedMonth}`; // '2025-01' ~ '2025-12'
+                    return {
+                        sMonth: monthNum.toString(), // 그래프에 표시할 월
+                        profit: profitMap.get(key) || null,
+                        cost: costMap.get(key) || null,
+                    };
+                });
                 // 모든 월을 합친 유니크한 Set
-                const allMonths = Array.from(new Set([...profitMap.keys(), ...costMap.keys()]));
+                // const allMonths = Array.from(new Set([...profitMap.keys(), ...costMap.keys()]));
 
-                // 월별로 profit, cost를 병합하여 포맷
-                const formatted = allMonths.map(month => ({
-                    sMonth: month,
-                    profit: profitMap.get(month) || 0,
-                    cost: costMap.get(month) || 0,
-                })).sort((a, b) => Number(a.sMonth) - Number(b.sMonth)); // 월 정렬
+                // // 월별로 profit, cost를 병합하여 포맷
+                // const formatted = allMonths.map(month => ({
+                //     sMonth: month,
+                //     profit: profitMap.get(month) || 0,
+                //     cost: costMap.get(month) || 0,
+                // })).sort((a, b) => Number(a.sMonth) - Number(b.sMonth)); // 월 정렬
                 console.log(formatted, "formatted")
                 setSalesData(formatted);
             } else {
