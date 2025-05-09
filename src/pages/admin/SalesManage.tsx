@@ -1,12 +1,12 @@
 import React, { MouseEvent, useEffect, useState } from 'react';
-import AdminSalesModal from './AdminSalesModal';
+import AdminSalesModal from '../../components/admin/AdminSalesModal';
 import { Button, Form, Pagination } from 'react-bootstrap';
 import axios from 'axios';
 import { BrowserRouter, useSearchParams } from 'react-router-dom';
 import ReactDOM from 'react-dom/client';
-import Layout from '../Layout';
+import Layout from '../../Layout';
 import api from '../../api';
-import { AdminSalesDto } from '../../Type/AdminSalesDto';
+import { AdminSalesDto } from '../../types/AdminSalesDto';
 
 
 interface PageInfo {
@@ -18,25 +18,7 @@ interface PageInfo {
     totalRow: number;
   }
 function SalesManage() {
-    const [acode, setAcodeList] = useState(["수입", "지출"])
-    const A_CODE_MAP: { [key: string]: string } = {
-        "PROFIT": "수입",
-        "COST": "지출"
-    };
-    const [bcode, setBcodeList] = useState([
-        { class: "수입", detail: "수업료 수입" },
-        { class: "수입", detail: "기타 수입" },
-        { class: "지출", detail: "강사 월급" },
-        { class: "지출", detail: "발주 비용" },
-        { class: "지출", detail: "기타 지출" }
-      ]);
-    const B_CODE_MAP: { [key: string]: string } = {
-        "CLS": "수업료 수입",
-        "ETC": "기타 수입",
-        "SALARY": "강사 월급",
-        "ITEM": "발주 비용",
-        "C_ETC": "기타 지출"
-    };
+
     const REVERSE_B_CODE_MAP: { [key: string]: string } = {
         "수업료 수입": "CLS",
         "기타 수입": "ETC",
@@ -114,15 +96,7 @@ function SalesManage() {
         })
         .then(res=>{
             setPageInfo(res.data);
-            const mappedData = (res.data.list as AdminSalesDto[]).map(item => ({
-                ...item,
-                cdAcode: A_CODE_MAP[item.cdAcode] || item.cdAcode,  // a_code 매핑 || 못찾으면 원래값
-                cdBcode: B_CODE_MAP[item.cdBcode] || item.cdBcode // b_code 매핑 || 못찾으면 원래값
-            }));
-            setPageInfo({
-                ...res.data,
-                list: mappedData
-            });
+            console.log(res.data)
             setPageArray(range(res.data.startPageNum, res.data.endPageNum))
         })
         .catch(error=>console.log(error+"리스트를 불러오는데 오류가 생겼습니다"));
@@ -219,9 +193,19 @@ function SalesManage() {
         })
     }
     return (
-        <Layout currentMenu="salesmanage">
+        <div>
+            <button onClick={()=>{
+                api.get("/sales/ping")
+                .then(res=>{
+                    console.log(res.data)
+                    alert(res.data)
+                })
+                .catch(error=>{
+                    alert("응답하지 않음")
+                })
+            }}>ping 요청</button>
             <AdminSalesModal show={modalShow} title={title} btnTag={btnTag} onBtn={onBtn} 
-                                onClose={()=>setModalShow(false)} acode={acode} bcode={bcode} initialData={selectedItem}/>
+                                onClose={()=>setModalShow(false)} initialData={selectedItem}/>
         
             <div className='container'>
             <h3 className="mb-3">매출 리스트</h3>
@@ -261,8 +245,8 @@ function SalesManage() {
                                     <td>{item.editDate}</td>
                                     <td>{item.saleName}</td>
                                     <td>{item.price}</td>
-                                    <td>{item.cdAcode}</td>
-                                    <td>{item.cdBcode}</td>
+                                    <td>{item.aname}</td>
+                                    <td>{item.bname}</td>
                                     <td>
                                         <button onClick={()=>handleUpdate(item.adminSaleId)} className="btn btn-sm btn-outline-primary">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">
@@ -299,7 +283,7 @@ function SalesManage() {
                     </Pagination> 
                 </div>
             </div>
-        </Layout>
+        </div>
     );
 }
 

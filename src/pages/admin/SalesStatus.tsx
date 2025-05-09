@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import Layout from '../Layout';
+import Layout from '../../Layout';
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,PieChart, Pie, Cell, ResponsiveContainer
   } from 'recharts';
 import { Button, Form } from 'react-bootstrap';
 import api from '../../api';
-import { AdminSalesStatDto } from '../../Type/AdminSalesStatDto';
+import { AdminSalesStatDto } from '../../types/AdminSalesStatDto';
 
 type MonthlyData = {
     sMonth: string;
@@ -81,7 +81,7 @@ function SalesStatus(props) {
                 });
                 console.log(profitMap, "profitMap")
                 console.log(costMap, "costMap")
-                //1월 ~12월 빈 값 넣어주기 + 연도-월 형식으로 값 대응시키기
+
                 const formatted = Array.from({ length: 12 }, (_, i) => {
                     const monthNum = i + 1;
                     const paddedMonth = monthNum.toString().padStart(2, '0'); // '01' ~ '12'
@@ -92,15 +92,7 @@ function SalesStatus(props) {
                         cost: costMap.get(key) || null,
                     };
                 });
-                // 모든 월을 합친 유니크한 Set
-                // const allMonths = Array.from(new Set([...profitMap.keys(), ...costMap.keys()]));
-
-                // // 월별로 profit, cost를 병합하여 포맷
-                // const formatted = allMonths.map(month => ({
-                //     sMonth: month,
-                //     profit: profitMap.get(month) || 0,
-                //     cost: costMap.get(month) || 0,
-                // })).sort((a, b) => Number(a.sMonth) - Number(b.sMonth)); // 월 정렬
+                
                 console.log(formatted, "formatted")
                 setSalesData(formatted);
             } else {
@@ -131,7 +123,15 @@ function SalesStatus(props) {
         });    
     };
 
-    
+    const DEFAULT_COLORS = [
+        '#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#a28ee6',
+        '#00C49F', '#FFBB28', '#0088FE', '#FF6666', '#66CCFF',
+        '#CC66FF', '#FFCC66', '#66FF66', '#FF99CC', '#9966CC',
+        '#66FFFF', '#FF9933', '#6699FF', '#FF66B2', '#A3E4D7',
+        '#F1948A', '#BB8FCE', '#F7DC6F', '#48C9B0', '#F0B27A',
+        '#D7BDE2', '#AED6F1', '#F8C471', '#DC7633', '#5499C7'
+    ];
+
     // const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042'];
     const SUBJECT_COLORS: { [key: string]: string } = {
         JAVA: '#8884d8',        // 보라
@@ -237,8 +237,39 @@ function SalesStatus(props) {
             setMonthlySalesByLecture([]);
         }
     }, [sMonth]);
+    const [subjectColorMap, setSubjectColorMap] = useState<{ [key: string]: string }>({});
+
+    useEffect(() => {
+        if (selected === "salesByLecture") {
+            const allSubjects = new Set<string>();
+            yearlySalesByLecture.forEach(item => allSubjects.add(item.subject || "알 수 없음"));
+            monthlySalesByLecture.forEach(item => allSubjects.add(item.subject || "알 수 없음"));
+
+            const newMap: { [key: string]: string } = {};
+            let colorIndex = 0;
+
+            for (let subject of allSubjects) {
+                if (!subjectColorMap[subject]) {
+                    newMap[subject] = DEFAULT_COLORS[colorIndex % DEFAULT_COLORS.length];
+                    colorIndex++;
+                }
+            }
+
+            setSubjectColorMap(prev => ({ ...prev, ...newMap }));
+        }
+    }, [yearlySalesByLecture, monthlySalesByLecture, selected]);
     return (
-        <Layout currentMenu="salesstat">
+        <div>
+            <button onClick={()=>{
+                api.get("/sales/ping")
+                .then(res=>{
+                    console.log(res.data)
+                    alert(res.data)
+                })
+                .catch(error=>{
+                    alert("응답하지 않음")
+                })
+            }}>ping 요청</button>
             <div>
                 <h3>매출 확인 영역</h3>
                 <div className="d-flex justify-content-between align-items-center mb-3 row">
@@ -362,7 +393,7 @@ function SalesStatus(props) {
                     }
             </div>
 
-        </Layout>
+        </div>
     );
 }
 export default SalesStatus;

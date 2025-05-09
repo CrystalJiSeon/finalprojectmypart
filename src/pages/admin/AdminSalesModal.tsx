@@ -5,21 +5,33 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React from 'react';
 
 type Student = {id:number, name:string}
-function AdminSalesModal({show, title, btnTag, onBtn, onClose, bcode, acode, initialData}) {
-    const [selectedBcode, setSelectedBcode] = useState('');
+function AdminSalesModal({show, title, btnTag, onBtn, onClose, initialData}) {
+    const [selectedBname, setSelectedBname] = useState('');
+    const [selectedAname, setSelectedAname] = useState('');
     const [selectedAcode, setSelectedAcode] = useState('');
+    const [selectedBcode, setSelectedBcode] = useState('');
+    const [acodelist, setAcodeList] = useState(["수입", "지출"])
+    const [bcodelist, setBcodeList] = useState([
+        { class: "수입", detail: "수업료 수입" },
+        { class: "수입", detail: "기타 수입" },
+        { class: "지출", detail: "강사 월급" },
+        { class: "지출", detail: "발주 비용" },
+        { class: "지출", detail: "기타 지출" }
+    ]);
     const [adminSaleId, setAdminSaleId] = useState<number|null>(null);
     const [price, setPrice] = useState(0);
     const [saleName, setSaleName] = useState<string>('');
     //SaleName의 길이가 20자 이상일 경우 true로 설정
     const [isTooLong, setIsTooLong] = useState(false);
-    const filteredBcode = bcode.filter(item => item.class === selectedAcode);
+    const filteredBcode = bcodelist.filter(item => item.class === selectedAcode);
     useEffect(() => {
         console.log(show, title,btnTag,onBtn,onClose)
         resetState();
     }, [initialData]);
     const resetState = () => {
         if (initialData) {
+            setSelectedAname(initialData.aname);
+            setSelectedBname(initialData.bname);
             setSelectedAcode(initialData.cdAcode);
             setSelectedBcode(initialData.cdBcode);
             setSaleName(initialData.saleName);
@@ -61,7 +73,7 @@ function AdminSalesModal({show, title, btnTag, onBtn, onClose, bcode, acode, ini
                                     setSelectedAcode(e.target.value)
                             })}>
                                 <option value="">구분</option>
-                                {acode.map((item, index) => (
+                                {acodelist.map((item, index) => (
                                     <option key={index} value={item}>{item}</option>
                                 ))}
                             </Form.Select>
