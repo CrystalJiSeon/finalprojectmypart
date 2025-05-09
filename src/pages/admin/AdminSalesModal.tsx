@@ -69,7 +69,7 @@ function AdminSalesModal({show, title, btnTag, onBtn, onClose, initialData}) {
                     <Form.Group>
                         <Form.Group className="mb-3" controlId="acode">
                             <Form.Label>대분류</Form.Label>
-                            <Form.Select value={selectedAcode} onChange={((e)=>{
+                            <Form.Select value={selectedAname} onChange={((e)=>{
                                     setSelectedAcode(e.target.value)
                             })}>
                                 <option value="">구분</option>
@@ -80,7 +80,7 @@ function AdminSalesModal({show, title, btnTag, onBtn, onClose, initialData}) {
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="bcode">
                             <Form.Label>소분류</Form.Label>
-                            <Form.Select value={selectedBcode} onChange={(e)=>{setSelectedBcode(e.target.value); }}>
+                            <Form.Select value={selectedBname} onChange={(e)=>{setSelectedBcode(e.target.value); }}>
                                 <option value="">구분</option>
                                 {filteredBcode.map((item, index) => (
                                     <option key={index} value={item.detail}>{item.detail}</option>
