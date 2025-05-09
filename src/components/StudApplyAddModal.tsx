@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, CloseButton, Form, Modal, Table } from 'react-bootstrap';
 
 function StudApplyAddModal({
-    show, onClose,onAddStudents,currentCount,maxCount,allStudents, alreadyAddedIds,
+    show, onClose,onAddStudents,currentCount,maxCount, studentCount, allStudents, alreadyAddedIds
   }) {
     const [searchKeyword, setSearchKeyword] = useState('');
     const [searchResults, setSearchResults] = useState([]);
@@ -35,7 +35,7 @@ function StudApplyAddModal({
       selectedStudents.some((s) => s.id === studentId);
   
     const handleConfirm = () => {
-      onAddStudents(selectedStudents);
+      onAddStudents(selectedStudents); // 전달만 하면 됨
       setSelectedStudents([]);
       setSearchKeyword('');
       onClose();
@@ -59,73 +59,76 @@ function StudApplyAddModal({
                 placeholder="학생 이름 검색"
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
-                className="mb-3"
-            />
-  
-            <h6>검색 결과</h6>
-            <Table striped bordered size="sm" style={{maxHeight:300, overflow:'auto'}}> 
+                className="mb-3"/>
+            <div style={{ maxHeight: 200, overflowY: 'auto' }}>
+              <h6>검색 결과</h6>
+              <Table bordered size="sm" > 
+                  <thead>
+                    <tr>
+                        <th>선택</th>
+                        <th>학생코드</th>
+                        <th>학생명</th>
+                        <th>연락처</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {searchResults.map((student) => (
+                        <tr key={student.id}>
+                        <td>
+                            <Form.Check
+                            type="checkbox"
+                            checked={isSelected(student.id)}
+                            onChange={() => toggleStudent(student)}
+                            disabled={
+                              !isSelected(student.id) &&
+                              selectedStudents.length >= (maxCount - currentCount)
+                            }
+                            />
+                        </td>
+                        <td>{student.id}</td>
+                        <td>{student.name}</td>
+                        <td>{student.phone}</td>
+                        </tr>
+                    ))}
+                  </tbody>
+              </Table>
+            </div>
+           
+            <div>
+              <h6 className="mt-4">추가 대상 (현재 수업 {maxCount-(studentCount+selectedStudents.length)}명 추가 가능)</h6>
+              <Table bordered size="sm">
                 <thead>
-                <tr>
-                    <th>선택</th>
-                    <th>학생코드</th>
-                    <th>학생명</th>
-                    <th>연락처</th>
-                </tr>
+                    <tr>
+
+                        <th>이름</th>
+                        <th>연락처</th>
+                        <th>삭제</th>
+                    </tr>
                 </thead>
                 <tbody>
-                {searchResults.map((student) => (
-                    <tr key={student.id}>
-                    <td>
-                        <Form.Check
-                        type="checkbox"
-                        checked={isSelected(student.id)}
-                        onChange={() => toggleStudent(student)}
-                        />
-                    </td>
-                    <td>{student.id}</td>
-                    <td>{student.name}</td>
-                    <td>{student.phone}</td>
+                    {selectedStudents.map((s) => (
+                    <tr key={s.id}>
+                        <td>{s.name}</td>
+                        <td>{s.phone}</td>
+                        <td>
+                        <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() =>
+                            setSelectedStudents((prev) => prev.filter((student) => student.id !== s.id))
+                            }
+                        >
+                            삭제
+                        </Button>
+                        </td>
                     </tr>
-                ))}
+                    ))}
                 </tbody>
-            </Table>
-  
-            <h6 className="mt-4">추가 예정자 ({selectedStudents.length}명)</h6>
-            <Table striped bordered size="sm">
-            <thead>
-                <tr>
-
-                    <th>이름</th>
-                    <th>연락처</th>
-                    <th>삭제</th>
-                </tr>
-            </thead>
-            <tbody>
-                {selectedStudents.map((s) => (
-                <tr key={s.id}>
-                    <td>{s.name}</td>
-                    <td>{s.phone}</td>
-                    <td>
-                    <Button
-                        variant="danger"
-                        size="sm"
-                        onClick={() =>
-                        setSelectedStudents((prev) => prev.filter((student) => student.id !== s.id))
-                        }
-                    >
-                        삭제
-                    </Button>
-                    </td>
-                </tr>
-                ))}
-            </tbody>
-            </Table>
+              </Table>
+            </div>
         </Modal.Body>
   
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            취소
-          </Button>
           <Button
             variant="primary"
             onClick={handleConfirm}

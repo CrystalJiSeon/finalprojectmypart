@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { Button, CloseButton, Form, Modal, Table } from 'react-bootstrap';
 
-function StudApplyStatModal({ show, onClose, students, className, onOpenSecondModal }) {
-    const handleClose=()=>{}
-    const [studentCount, setStudentCount] = useState(10);
-    const maxCount = 20;
+function StudApplyStatModal({ show, onClose, students, className, onOpenSecondModal, onRemoveStudent, studentCount, maxCount }) {
+
+ 
     return (
-        <Modal show={show} onHide={onClose} size="lg" centered>
+        <Modal show={show} onHide={onClose} size="xl" centered>
             <Modal.Header>
                 <Modal.Title>{`${className} 수강생 리스트`}</Modal.Title>
                 <CloseButton onClick={onClose} />
@@ -43,8 +42,8 @@ function StudApplyStatModal({ show, onClose, students, className, onOpenSecondMo
                     </Button>
                 </div>
 
-                <div style={{ maxHeight: 200, maxWidth: 600, overflowY: 'auto', width: '100%' }}>
-                    <Table striped bordered size="sm" style={{textAlign:'center', verticalAlign:"middle"}}>
+                <div style={{ maxHeight: 300, maxWidth: 600, overflowY: 'auto', width: '100%' }}>
+                    <Table bordered size="sm" style={{textAlign:'center', verticalAlign:"middle"}}>
                         <thead>
                             <tr>
                                 <th>이름</th>
@@ -59,8 +58,10 @@ function StudApplyStatModal({ show, onClose, students, className, onOpenSecondMo
                                     <td>{student.phone}</td>
                                     <td>
                                         <Button
-                                            onClick={onOpenSecondModal}
+                                            variant="secondary"
+                                            onClick={() => onRemoveStudent(student.id)}
                                             className="mt-3"
+                                            size="sm"
                                             style={{
                                                 fontSize: '1rem',   // 버튼 크기 조정
                                                 padding: '0.375rem 0.75rem',
