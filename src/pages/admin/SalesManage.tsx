@@ -1,12 +1,12 @@
 import React, { MouseEvent, useEffect, useState } from 'react';
-import AdminSalesModal from '../../components/admin/AdminSalesModal';
+import AdminSalesModal from '../admin/AdminSalesModal';
 import { Button, Form, Pagination } from 'react-bootstrap';
 import axios from 'axios';
 import { BrowserRouter, useSearchParams } from 'react-router-dom';
 import ReactDOM from 'react-dom/client';
 import Layout from '../../Layout';
 import api from '../../api';
-import { AdminSalesDto } from '../../types/AdminSalesDto';
+import { AdminSalesDto } from '../../Type/AdminSalesDto';
 
 
 interface PageInfo {
@@ -19,13 +19,6 @@ interface PageInfo {
   }
 function SalesManage() {
 
-    const REVERSE_B_CODE_MAP: { [key: string]: string } = {
-        "수업료 수입": "CLS",
-        "기타 수입": "ETC",
-        "강사 월급": "SALARY",
-        "발주 비용": "ITEM",
-        "기타 지출": "C_ETC"
-    };
     const [modalShow, setModalShow] = useState(false);
     const [title, setTitle] = useState("매출 추가");
     const [btnTag, setBtnTag] = useState("추가")
@@ -96,10 +89,9 @@ function SalesManage() {
         })
         .then(res=>{
             setPageInfo(res.data);
-            console.log(res.data)
             setPageArray(range(res.data.startPageNum, res.data.endPageNum))
         })
-        .catch(error=>console.log(error+"리스트를 불러오는데 오류가 생겼습니다"));
+        .catch(error=>console.error("리스트를 불러오는데 오류가 생겼습니다"));
     }
     const handleAdd = () => {
         setSelectedItem(null); // 초기화
@@ -110,23 +102,20 @@ function SalesManage() {
         
     };
     const handleAddSales = (data:{
-        selectedAcode: string;
-        selectedBcode: string;
+        selectedAname: string;
+        selectedBname: string;
         saleName:string;
         price:number;
     })=>{
-        console.log("Add Sales Data:", data);
         const requestBody = {
-            cdAcode:data.selectedAcode ==="수입"? "PROFIT":"COST",
-            cdBcode: REVERSE_B_CODE_MAP[data.selectedBcode]||data.selectedBcode,
+            aname:data.selectedAname,
+            bname: data.selectedBname,
             saleName:data.saleName,
             price:data.price,
             userId:1
         }
-        console.log(requestBody)
         api.post("/sales", requestBody)
         .then(res=>{
-            console.log(res.data);
             alert("매출이 추가되었습니다")
             setModalShow(false)
             handleSearch(); // 추가 후 리스트 갱신
@@ -149,8 +138,8 @@ function SalesManage() {
     }; 
     const handleUpdateSales=(
         data: {
-            selectedAcode: string;
-            selectedBcode: string;
+            selectedAname: string;
+            selectedBname: string;
             saleName: string;
             price: number;
             adminSaleId: number;
@@ -161,8 +150,8 @@ function SalesManage() {
         if (!adminSaleId) return;
     
         const requestBody = {
-            cdAcode: data.selectedAcode === "수입" ? "PROFIT" : "COST",
-            cdBcode: REVERSE_B_CODE_MAP[data.selectedBcode] || data.selectedBcode,
+            aname: data.selectedAname,
+            bname: data.selectedBname,
             saleName: data.saleName,
             price: data.price,
             adminSaleId: adminSaleId,
@@ -182,7 +171,6 @@ function SalesManage() {
     const handleDelete=(id:number)=>{
         const item = pageInfo.list.find(item => item.adminSaleId === id);
         if (!item) return;
-        console.log("item 삭제"+item)
         const adminSaleId=item.adminSaleId
         api.delete(`/sales/${adminSaleId}`)
         .then(res=>{
@@ -194,16 +182,6 @@ function SalesManage() {
     }
     return (
         <div>
-            <button onClick={()=>{
-                api.get("/sales/ping")
-                .then(res=>{
-                    console.log(res.data)
-                    alert(res.data)
-                })
-                .catch(error=>{
-                    alert("응답하지 않음")
-                })
-            }}>ping 요청</button>
             <AdminSalesModal show={modalShow} title={title} btnTag={btnTag} onBtn={onBtn} 
                                 onClose={()=>setModalShow(false)} initialData={selectedItem}/>
         
@@ -212,11 +190,11 @@ function SalesManage() {
                 <div className="d-flex justify-content-between align-items-center mb-3 row">
                     <div className="col-md-8 col-12 d-flex justify-content-between align-items-center">
                         <Form className='d-flex w-100'>
-                            <Form.Check inline label="수업료 수입" value="CLS" type="checkbox" id="CLS"onChange={handleCheckboxChange}/>
-                            <Form.Check inline label="기타 수입" value="ETC" type="checkbox" id="ETC" onChange={handleCheckboxChange}/>
-                            <Form.Check inline label="강사 월급" value="SALARY" type="checkbox" id="SALARY" onChange={handleCheckboxChange}/>
-                            <Form.Check inline label="발주 비용" value="ITEM" type="checkbox" id="ITEM" onChange={handleCheckboxChange}/>
-                            <Form.Check inline label="기타 지출" value="C_ETC" type="checkbox" id="C_ETC" onChange={handleCheckboxChange}/>
+                            <Form.Check inline label="수업수입" value="CLS" type="checkbox" id="CLS"onChange={handleCheckboxChange}/>
+                            <Form.Check inline label="나머지수입" value="ETC" type="checkbox" id="ETC" onChange={handleCheckboxChange}/>
+                            <Form.Check inline label="급여" value="SALARY" type="checkbox" id="SALARY" onChange={handleCheckboxChange}/>
+                            <Form.Check inline label="발주" value="ITEM" type="checkbox" id="ITEM" onChange={handleCheckboxChange}/>
+                            <Form.Check inline label="지출기타" value="C_ETC" type="checkbox" id="C_ETC" onChange={handleCheckboxChange}/>
                             <Button className='btn btn-secondary' size="sm" style={{ width: "50px" }} onClick={()=>{handleSearch(); move(1)}}>검색</Button>
                         </Form>
                     </div>

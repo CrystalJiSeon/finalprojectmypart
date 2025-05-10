@@ -7,7 +7,7 @@ import {
   } from 'recharts';
 import { Button, Form } from 'react-bootstrap';
 import api from '../../api';
-import { AdminSalesStatDto } from '../../types/AdminSalesStatDto';
+import { AdminSalesStatDto } from '../../Type/AdminSalesStatDto';
 
 type MonthlyData = {
     sMonth: string;
@@ -133,12 +133,12 @@ function SalesStatus(props) {
     ];
 
     // const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042'];
-    const SUBJECT_COLORS: { [key: string]: string } = {
-        JAVA: '#8884d8',        // 보라
-        JAVASCRIPT: '#82ca9d',  // 초록
-        PYTHON: '#ffc658',      // 노랑
-        '알 수 없음': '#ff8042'  // 기타 (예외 처리용)
-    };
+    // const SUBJECT_COLORS: { [key: string]: string } = {
+    //     JAVA: '#8884d8',        // 보라
+    //     JAVASCRIPT: '#82ca9d',  // 초록
+    //     PYTHON: '#ffc658',      // 노랑
+    //     '알 수 없음': '#ff8042'  // 기타 (예외 처리용)
+    // };
     const [yearlySalesByLecture, setYearlySalesByLecture] = useState<LectureSalesData[]>([]);
     const [monthlySalesByLecture, setMonthlySalesByLecture] = useState<LectureSalesData[]>([]);
     
@@ -337,7 +337,7 @@ function SalesStatus(props) {
                                         {yearlySalesByLecture.map((entry, index) => (
                                         <Cell
                                             key={`cell-yearly-${index}`}
-                                            fill={SUBJECT_COLORS[entry.subject ?? '알 수 없음'] || '#ccc'}
+                                            fill={subjectColorMap[entry.subject ?? '알 수 없음'] || '#ccc'}
                                         />
                                         ))}
                                     </Pie>
@@ -377,7 +377,7 @@ function SalesStatus(props) {
                                         {monthlySalesByLecture.map((entry, index) => (
                                         <Cell
                                             key={`cell-monthly-${index}`}
-                                            fill={SUBJECT_COLORS[entry.subject ?? '알 수 없음'] || '#ccc'}
+                                            fill={subjectColorMap[entry.subject ?? '알 수 없음'] || '#ccc'}
                                         />
                                         ))}
                                     </Pie>
